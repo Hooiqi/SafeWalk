@@ -7,7 +7,7 @@ A campus safety system for USM. It helps students and staff share trips, call fo
 ## The four modules
 
 | Module | What it does |
-|---|---|---|
+|---|---| 
 | [M1 Trip and ETA](modules/m1-trip-eta/) | Share a live trip. Auto-alert contacts and security if the student does not arrive on time. |
 | [M2 SOS and safe places](modules/m2-sos-safe-places/) | One-tap emergency call and location sharing. Shows the nearest booths and safe places. |
 | [M3 Reports and safety map](modules/m3-reports-safety-map/) | Report incidents and unsafe spots. Everyone sees verified incidents on a map. |
