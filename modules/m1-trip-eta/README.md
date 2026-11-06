@@ -3,38 +3,32 @@
 **Owner:** @member1
 
 ## Purpose
-Let a student share a trip with trusted people, and alert them and security automatically if the student does not arrive on time.
+Protect students on solo or late-night walks: share a live journey with trusted
+contacts, and alert them and USM Security automatically if the student does not
+arrive and does not respond (proposal 5.1, Module 1).
 
-## Scope
-
-**Must have**
-- Trusted contacts: find a registered user, send and accept a request
-- Create a trip: destination, ETA, grace period, who to share with
-- Live location sharing during the trip
-- Contact view: live position and ETA countdown
-- "I have arrived", extend ETA, cancel trip
-- **Missed-ETA check on the server:** if the trip is overdue after the grace period, mark it MISSED and create a MISSED_ETA alert with the last known location
-
-**Extras**
-- Trip history
-- Battery-friendly location updates
-
-## Data
-| Reads | Writes |
+## Where the code is
+| Part | Location |
 |---|---|
-| `users`, `contacts` | `contacts`, `trips`, `alerts` (type MISSED_ETA) |
-
-## Gives to other modules
-M4 receives MISSED_ETA alerts and shows them to security.
-
-## Hard parts
-Location tracking while the screen is off (differs between phones), and testing the missed-ETA check. Test on a real phone early.
+| Trip API, state machine, location ingest | `apps/server/src/modules/trips/` |
+| ETA watchdog (node-cron) | `apps/server/src/modules/watchdog/etaWatchdog.js` |
+| OSRM routing | `apps/server/src/modules/routing/` |
+| Contact notifications | `apps/server/src/modules/notifications/` |
+| Tracking link API | `apps/server/src/modules/tracking/` |
+| Mobile screens | `apps/mobile/lib/features/{journey,contacts,history}/`, `lib/services/trip_tracker.dart` |
+| Trusted-contact page | `apps/tracking/` |
+| Tables | `trip`, `trip_trusted_contact`, `location_log`, `trusted_contact`, `sos_alert` (`ETA`) |
 
 ## Progress
-- [ ] Contacts
-- [ ] Create and run a trip
-- [ ] Live location sharing
-- [ ] Contact view
-- [ ] Missed-ETA check
-- [ ] Tests with seed data
-- [ ] Integration test with M4
+- [x] Trusted contacts (add, edit, remove)
+- [x] Destination on map, OSRM route and ETA
+- [x] Secure tracking link with expiry
+- [x] Live GPS and heartbeat over Socket.io, offline buffering
+- [x] Trusted-contact tracking page
+- [x] Server-side watchdog: grace period (3 min), escalation, heartbeat loss
+- [x] Escalation reaches the security dashboard
+- [x] Contact alerts over SMS / Telegram / email (needs credentials to send)
+- [x] Journey history
+- [x] Automated tests (server and Flutter)
+- [ ] Field test on a real phone (background location, screen off)
+- [ ] Hazard check before walking (needs the Module 3 map)

@@ -6,7 +6,7 @@ Mandatory for all four members. Five minutes to read.
 
 1. **Never push to `main`.** Use a branch and a pull request.
 2. **One branch = one small task.** Under about 300 changed lines.
-3. **Stay in your own module folder.** Need a change elsewhere? Ask the owner.
+3. **Stay in your own module's code.** Code is split by app (`apps/server`, `apps/mobile`, …) and, inside each app, by module folder (e.g. `apps/server/src/modules/trips`, `apps/mobile/lib/features/journey`). Need a change elsewhere? Ask the owner.
 4. **Checks must pass** before you merge (once automatic checks are set up).
 5. **Every pull request needs 1 approval.** Shared files need all other owners. Nobody approves their own.
 6. **No secrets in the repo.** No keys, passwords, or service account files.
@@ -19,7 +19,7 @@ Mandatory for all four members. Five minutes to read.
 
 Each module folder belongs to one owner (see `.github/CODEOWNERS`).
 
-**Shared files** (all four owners approve): `docs/03-data-contract.md`, `shared/`, `.github/`, and the root `README.md`.
+**Shared files** (all four owners approve): `supabase/migrations/`, `packages/shared/`, `apps/mobile/lib/core/constants.dart`, `.github/`, and the root `README.md`.
 
 ## Daily workflow
 
@@ -55,7 +55,7 @@ Open a pull request, fill in the template, get one review, **squash and merge**,
 
 ## Automatic checks (CI/CD)
 
-Not set up yet. Add them after the tech stack is confirmed. Plan: checks on every pull request, protected `main`, and deployment after merge.
+Not set up yet. Run `npm test` and `flutter analyze && flutter test` before every pull request. Plan: checks on every pull request, protected `main`, and deployment after merge.
 
 ## Done means
 

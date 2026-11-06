@@ -1,0 +1,30 @@
+# Supabase CLI configuration for local development (`supabase start`).
+# See docs/setup.md. Only the settings SafeWalk depends on are listed;
+# the CLI fills in defaults for everything else.
+project_id = "safewalk"
+
+[api]
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+major_version = 15
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[auth]
+site_url = "http://localhost:5174"
+additional_redirect_urls = ["http://localhost:5174", "http://localhost:5173"]
+jwt_expiry = 3600
+
+[auth.email]
+enable_signup = true
+# Staff access requires a confirmed email (see public.is_security_staff).
+# Locally, confirmation emails are captured by Inbucket at http://localhost:54324.
+enable_confirmations = true
+
+[storage]
+enabled = true

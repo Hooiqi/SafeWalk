@@ -1,0 +1,76 @@
+# Database
+
+Supabase PostgreSQL with PostGIS. Migrations: `supabase/migrations/`.
+All location columns are `geography(…, 4326)` (WGS 84 latitude/longitude, distances in metres).
+
+## ERD entities (proposal Diagram 12.5) to tables
+
+| ERD entity | Table | Created in | Notes |
+|---|---|---|---|
+| USER | `app_user` | `20261106000100` | `user` is reserved in PostgreSQL. `user_id` references Supabase `auth.users`; the row is created by a trigger at sign-up |
+| SECURITY_STAFF | `security_staff` | `20261106000100` | The admin email allow-list |
+| TRUSTED_CONTACT | `trusted_contact` | `20261106000100` | |
+| TRIP | `trip` | `20261106000100` | |
+| LOCATION_LOG | `location_log` | `20261106000100` | |
+| SOS_ALERT | `sos_alert` | `20261106000100` | Shared by Module 1 (trigger `ETA`) and Module 2 (`HOLD`, `SILENT`) |
+| ALERT_STATUS_LOG | `alert_status_log` | `20261106000100` | `staff_id` is null for system entries |
+| SAFE_POINT | `safe_point` | Module 2 migration | Not created yet |
+| INCIDENT_GROUP | `incident_group` | Module 3 migration | Not created yet |
+| INCIDENT_REPORT | `incident_report` | Module 3 migration | Not created yet |
+| ANNOUNCEMENT | `announcement` | Module 4 migration | Not created yet |
+
+Each module adds its own tables when it is built, so the schema is reviewed
+with the code that uses it.
+
+## Additions beyond the ERD
+
+| Table.column | Why |
+|---|---|
+| `trip_trusted_contact` (table) | The proposal says contacts are chosen per trip; the ERD has no table for that choice |
+| `trip.destination_label` | Readable destination for contacts and history |
+| `trip.route_distance_m`, `route_duration_s`, `route_source` | Keep the OSRM result and flag straight-line estimates |
+| `trip.extension_count` | Limit how often the ETA can be extended |
+| `trip.signal_lost_at` | Heartbeat monitoring result shown to contacts and security |
+| `trip.escalated_at`, `ended_at`, `end_reason` | Record state-machine transitions |
+| `trip.share_expires_at` | Tracking-link expiry after the trip ends |
+| `trip.updated_at` | Auditing |
+| `location_log.accuracy_m`, `received_at` | GPS accuracy and server receipt time |
+| `security_staff.is_active`, `created_at` | Disable staff without deleting history |
+| `trusted_contact.created_at` | Auditing |
+| `alert_status` value `NEW` | Alert not yet acknowledged by staff (see PLAN.md A3) |
+
+## Constraints that enforce business rules
+
+- `trip_one_open_per_user`: at most one ACTIVE / GRACE_PROMPT / ESCALATED trip per user.
+- `sos_alert_one_eta_per_trip`: a trip escalates at most once.
+- `location_log_trip_sample_key (trip_id, recorded_at)`: a resent GPS sample is ignored.
+- `trusted_contact_has_channel`: a contact needs a phone, Telegram id or email.
+- Phone numbers must be in international format (`+60…`).
+
+## Row Level Security
+
+Defined in `20261106000200_auth_and_rls.sql`; tested in `apps/server/test/trackingAndRls.test.js`.
+
+| Table | Student / staff user | Security staff | anon |
+|---|---|---|---|
+| `app_user` | read/update own | read | none |
+| `security_staff` | none | read | none |
+| `trusted_contact` | full access to own | none | none |
+| `trip`, `trip_trusted_contact`, `location_log` | read own | read escalated trips only | none |
+| `sos_alert` | read own | read, update status | none |
+| `alert_status_log` | read own alerts' log | read, insert as self | none |
+
+Trips, location logs and alerts are written only by the Node server, which
+connects with the database connection string (table owner, bypasses RLS) and
+applies its own authorisation. Clients have no INSERT/UPDATE policies on those
+tables, so the anon key plus a user token cannot forge them.
+
+Security staff are recognised by `public.is_security_staff(uid)`: the user's
+Supabase Auth email must be **confirmed** and match an active
+`security_staff.admin_email`. The server uses the same function, so the API
+and RLS cannot disagree.
+
+## Seed data
+
+`supabase/seed.sql` inserts one clearly labelled placeholder staff email
+(`security.demo@safewalk.test`) for local development only.

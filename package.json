@@ -1,0 +1,21 @@
+{
+  "name": "safewalk",
+  "private": true,
+  "description": "SafeWalk campus safety platform for Universiti Sains Malaysia (CAT304 Group 12)",
+  "workspaces": [
+    "packages/shared",
+    "apps/server",
+    "apps/tracking",
+    "apps/dashboard"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev -w @safewalk/server",
+    "dev:tracking": "npm run dev -w @safewalk/tracking",
+    "dev:dashboard": "npm run dev -w @safewalk/dashboard",
+    "test": "npm test -w @safewalk/server",
+    "build": "npm run build -w @safewalk/tracking && npm run build -w @safewalk/dashboard"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

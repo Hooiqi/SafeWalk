@@ -1,6 +1,6 @@
 # Tech stack decision
 
-**Status:** not decided. Fill this in as a team, then update the README.
+**Status:** decided by the Extended Project Proposal, Table 5.1 (23 Oct 2026).
 
 ## What we need
 
@@ -33,4 +33,20 @@
 
 ## Final decision
 
-(Write the chosen stack and the date here.)
+From the Extended Project Proposal (Table 5.1 and Diagram 12.7):
+
+| Need | Decision |
+|---|---|
+| Mobile app | Flutter (Dart) |
+| Security dashboard and tracking page | React.js (Vite) |
+| Backend | Node.js + Express |
+| Real-time | Socket.io |
+| Scheduled job (ETA watchdog) | node-cron on the server |
+| Database | Supabase PostgreSQL + PostGIS |
+| Login and access control | Supabase Auth + Row Level Security, staff email allow-list |
+| File storage | Supabase Storage (Module 3 photos) |
+| Maps and routing | OpenStreetMap + Leaflet (web), flutter_map (Flutter), OSRM walking API |
+| Push notifications | Firebase Cloud Messaging |
+| Contact alerts | Twilio SMS, Telegram Bot API, email (Nodemailer) |
+| Version control | GitHub |
+

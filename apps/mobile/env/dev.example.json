@@ -1,0 +1,10 @@
+{
+  "API_URL": "http://10.0.2.2:4000",
+  "SUPABASE_URL": "http://10.0.2.2:54321",
+  "SUPABASE_ANON_KEY": "paste the anon / publishable key from `supabase status` or the Supabase dashboard",
+  "TILE_URL": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "FIREBASE_API_KEY": "",
+  "FIREBASE_APP_ID": "",
+  "FIREBASE_SENDER_ID": "",
+  "FIREBASE_PROJECT_ID": ""
+}

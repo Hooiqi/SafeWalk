@@ -1,0 +1,157 @@
+/*
+ * SafeWalk design tokens (mandatory palette: "Dark mode: orange & pink").
+ * The seven palette colours are used as given. Other values are derived from
+ * them (tints for hover/selected states) - no new hues are introduced.
+ */
+:root {
+  /* Palette */
+  --sw-bg: #120f11;            /* App background */
+  --sw-surface: #1e191c;       /* Surface / cards */
+  --sw-primary: #ff6b81;       /* Primary accent */
+  --sw-secondary: #ffa372;     /* Secondary accent */
+  --sw-text: #fdf9fa;          /* Text primary */
+  --sw-text-muted: #a89fa3;    /* Text secondary */
+  --sw-border: #322b2e;        /* Borders / dividers */
+
+  /* Derived */
+  --sw-surface-raised: #262024;
+  --sw-surface-hover: #2b2428;
+  --sw-primary-soft: rgba(255, 107, 129, 0.12);
+  --sw-secondary-soft: rgba(255, 163, 114, 0.12);
+  --sw-gradient: linear-gradient(90deg, var(--sw-primary), var(--sw-secondary));
+  --sw-on-accent: #120f11;     /* text on pink/orange fills (contrast > 7:1) */
+
+  --sw-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --sw-font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --sw-radius-sm: 6px;
+  --sw-radius: 10px;
+  --sw-radius-lg: 14px;
+
+  --sw-space-1: 4px;
+  --sw-space-2: 8px;
+  --sw-space-3: 12px;
+  --sw-space-4: 16px;
+  --sw-space-5: 24px;
+  --sw-space-6: 32px;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--sw-bg);
+  color: var(--sw-text);
+  font-family: var(--sw-font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+button {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sw-secondary);
+  outline-offset: 2px;
+}
+
+.sw-muted { color: var(--sw-text-muted); }
+.sw-num { font-variant-numeric: tabular-nums; }
+
+/* Status badges always pair colour with text, never colour alone. */
+.sw-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--sw-border);
+  border-radius: var(--sw-radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.sw-badge::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.sw-badge--active { color: var(--sw-text); }
+.sw-badge--warning { color: var(--sw-secondary); border-color: rgba(255, 163, 114, 0.4); background: var(--sw-secondary-soft); }
+.sw-badge--danger { color: var(--sw-primary); border-color: rgba(255, 107, 129, 0.45); background: var(--sw-primary-soft); }
+.sw-badge--done { color: var(--sw-text-muted); }
+
+.sw-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--sw-border);
+  border-radius: var(--sw-radius);
+  background: var(--sw-surface-raised);
+  color: var(--sw-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+.sw-button:hover { background: var(--sw-surface-hover); }
+.sw-button:disabled { opacity: 0.55; cursor: not-allowed; }
+.sw-button--primary { background: var(--sw-primary); border-color: var(--sw-primary); color: var(--sw-on-accent); }
+.sw-button--primary:hover { background: #ff8094; }
+
+.sw-input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--sw-border);
+  border-radius: var(--sw-radius);
+  background: var(--sw-bg);
+  color: var(--sw-text);
+  font: inherit;
+}
+.sw-input:focus { border-color: var(--sw-secondary); outline: none; }
+
+/* Leaflet: dark map. OpenStreetMap standard tiles are inverted in CSS so the
+ * map matches the dark interface while still using OSM tiles (no third-party
+ * tile provider). Markers and overlays are not affected. */
+.sw-dark-tiles {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.35);
+}
+.leaflet-container {
+  background: var(--sw-bg);
+  font-family: var(--sw-font);
+}
+.leaflet-control-attribution {
+  background: rgba(18, 15, 17, 0.8) !important;
+  color: var(--sw-text-muted) !important;
+}
+.leaflet-control-attribution a { color: var(--sw-text) !important; }
+.leaflet-bar a {
+  background: var(--sw-surface) !important;
+  color: var(--sw-text) !important;
+  border-color: var(--sw-border) !important;
+}

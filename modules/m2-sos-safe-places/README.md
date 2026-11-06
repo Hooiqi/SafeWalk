@@ -1,5 +1,11 @@
 # M2: Emergency SOS and safe places
 
+> **Note (6 Nov 2026):** the Extended Project Proposal is now the source of truth
+> for this module's scope (section 5.1 and Diagram 12.x). Code goes in the apps
+> (`apps/server/src/modules/…`, `apps/mobile/lib/features/…`, `apps/dashboard`),
+> not in this folder. See `docs/PLAN.md` for the requirement list. The scope
+> below is from the earlier planning stage.
+
 **Owner:** @member2
 
 ## Purpose

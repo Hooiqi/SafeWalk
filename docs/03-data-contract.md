@@ -1,5 +1,12 @@
 # Data contract and naming rules
 
+> **Superseded for implementation (6 Nov 2026).** The Extended Project Proposal's
+> ERD (Diagram 12.5) is now the source of truth. The code uses the ERD's
+> `snake_case` names and enum values; see [database.md](database.md) and the
+> shared constants in `packages/shared/src/index.js`. The general rules below
+> (UTC storage, Malaysia time in the UI, international phone format,
+> system-generated IDs, no names in IDs) still apply. This file is kept for history.
+
 This is the shared agreement between the four modules. It does not depend on any technology. When the tech stack is chosen, translate it into the real database.
 
 **Rules**
