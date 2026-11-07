@@ -45,3 +45,38 @@ export function safeConfirmedMessage({ userName }) {
     text: `Update: ${userName} has confirmed in SafeWalk that they are safe. USM Security has been informed through the dashboard.`,
   };
 }
+
+export function sosMessage({ userName, silent, lastLocation, trackingUrl }) {
+  const where = lastLocation
+    ? `Location: ${osmLink(lastLocation)}`
+    : 'Their phone had not found a GPS position yet; the live link updates as soon as it does.';
+  return {
+    subject: `EMERGENCY: ${userName} sent an SOS (SafeWalk)`,
+    text:
+      `EMERGENCY: ${userName} triggered ${silent ? 'a silent' : 'an'} SOS in SafeWalk. ` +
+      `USM Security has been alerted. ${where}. Live location: ${trackingUrl}` +
+      (silent ? ' They may not be able to talk: do not call unless you are sure it is safe.' : ''),
+  };
+}
+
+export function sosSafeMessage({ userName }) {
+  return {
+    subject: `${userName} is safe (SafeWalk)`,
+    text: `Update: ${userName} has marked themselves safe in SafeWalk after their SOS.`,
+  };
+}
+
+const RESPONSE_TEXT = {
+  RECEIVED: 'USM Security has received your alert.',
+  ON_THE_WAY: 'USM Security is on the way to you.',
+  ARRIVED: 'USM Security has arrived at your location.',
+  RESOLVED: 'USM Security has marked your alert as resolved.',
+};
+
+export function responseUpdateMessage(status, note) {
+  return {
+    subject: 'SafeWalk: update from USM Security',
+    text: `${RESPONSE_TEXT[status] ?? 'Your alert was updated.'}${note ? ` ${note}` : ''}`,
+    data: { type: 'ALERT_STATUS', status },
+  };
+}

@@ -14,7 +14,7 @@ All location columns are `geography(…, 4326)` (WGS 84 latitude/longitude, dist
 | LOCATION_LOG | `location_log` | `20261106000100` | |
 | SOS_ALERT | `sos_alert` | `20261106000100` | Shared by Module 1 (trigger `ETA`) and Module 2 (`HOLD`, `SILENT`) |
 | ALERT_STATUS_LOG | `alert_status_log` | `20261106000100` | `staff_id` is null for system entries |
-| SAFE_POINT | `safe_point` | Module 2 migration | Not created yet |
+| SAFE_POINT | `safe_point` | `20261107000100` | 21 team-supplied points loaded by `20261107000200` without coordinates (pinned by staff) |
 | INCIDENT_GROUP | `incident_group` | Module 3 migration | Not created yet |
 | INCIDENT_REPORT | `incident_report` | Module 3 migration | Not created yet |
 | ANNOUNCEMENT | `announcement` | Module 4 migration | Not created yet |
@@ -38,6 +38,15 @@ with the code that uses it.
 | `security_staff.is_active`, `created_at` | Disable staff without deleting history |
 | `trusted_contact.created_at` | Auditing |
 | `alert_status` value `NEW` | Alert not yet acknowledged by staff (see PLAN.md A3) |
+| `sos_alert.client_request_id` | Idempotency key: a retried SOS request never creates a second alert |
+| `sos_alert.accuracy_m`, `share_token`, `share_expires_at` | GPS accuracy; live link for trusted contacts and its expiry |
+| `sos_alert.user_safe_at` | The person reported they are safe (sharing stops; security still resolves) |
+| `alert_status_log.note` | What the officer arranged ("Patrol 2 dispatched") |
+| `location_log.alert_id` (and `trip_id` nullable) | Location history of an SOS raised outside a journey; each row belongs to exactly one trip or alert |
+| `trip_end_reason` value `RESOLVED_BY_SECURITY` | Security resolved the overdue alert of an escalated journey |
+| `safe_point.name` + `category` | The ERD's single `name_and_category` column, split for filtering (PLAN.md A16) |
+| `safe_point.opening_schedule` | Machine-readable weekly hours used to filter by "open now"; `operating_hours` keeps the text shown to users |
+| `safe_point.location_description`, `contact_notes`, `notes`, `data_source`, `is_active` | Display details, other numbers, exceptions (holidays), provenance, retire without deleting |
 
 ## Constraints that enforce business rules
 
@@ -46,6 +55,17 @@ with the code that uses it.
 - `location_log_trip_sample_key (trip_id, recorded_at)`: a resent GPS sample is ignored.
 - `trusted_contact_has_channel`: a contact needs a phone, Telegram id or email.
 - Phone numbers must be in international format (`+60…`).
+- `sos_alert_request_key (user_id, client_request_id)` and `sos_alert_one_open_sos_per_user`: no duplicate SOS alerts.
+- `location_log_one_owner`: a location sample belongs to a trip or an alert, never both.
+
+## Opening hours
+
+`public.safe_point_is_open(schedule, at)` evaluates a schedule in Malaysia time
+(`{"always": true}` or `{"weekly": {"mon": [["08:00","17:00"]], …}}`; a range
+ending at or before its start runs past midnight). The navigator filters with it
+before the k-NN search. `apps/server/src/modules/safePoints/openingHours.js`
+computes "closes at / opens at" for display, and a test checks that both agree
+for every stored schedule across a full week.
 
 ## Row Level Security
 
@@ -59,6 +79,7 @@ Defined in `20261106000200_auth_and_rls.sql`; tested in `apps/server/test/tracki
 | `trip`, `trip_trusted_contact`, `location_log` | read own | read escalated trips only | none |
 | `sos_alert` | read own | read, update status | none |
 | `alert_status_log` | read own alerts' log | read, insert as self | none |
+| `safe_point` | read active | read all, insert, update | none |
 
 Trips, location logs and alerts are written only by the Node server, which
 connects with the database connection string (table owner, bypasses RLS) and

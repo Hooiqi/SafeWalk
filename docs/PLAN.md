@@ -15,7 +15,7 @@ External = needs credentials or institutional data the team must supply.
 |---|---|---|
 | 1. Setup | Monorepo, database schema, auth, RLS, shared design tokens | Done (6 Nov 2026) |
 | 2. Module 1 | Live trip sharing, ETA watchdog, escalation, tracking page | Done (6 Nov 2026) |
-| 3. Module 2 | Hold-to-confirm SOS, silent SOS, emergency calling, safe point navigator | Planned |
+| 3. Module 2 | Hold-to-confirm SOS, silent SOS, emergency calling, safe point navigator (+ M4 response workflow and safe point management) | Done (7 Nov 2026) |
 | 4. Module 3 | Incident reporting, photo upload, auto-verification, safety map | Planned |
 | 5. Module 4 | Full dashboard: response workflow, report review, safe points, announcements, analytics | Planned |
 | 6. Integration | Cross-module tests, field test on campus, final documentation | Planned |
@@ -71,12 +71,25 @@ Test files: server tests are in `apps/server/test/`, Flutter tests in
 
 ### Module 2: Emergency SOS and safe point navigator
 
-| Proposal requirement | Implementation | Status |
-|---|---|---|
-| Hold-to-confirm SOS (about 3 s) | `sos_alert` table and `HOLD` trigger type exist | Planned |
-| One-tap call to USM Security hotline, 999 fallback | | Planned; External (hotline number confirmation) |
-| Silent SOS | `SILENT` trigger type exists | Planned |
-| Nearest safe point, PostGIS k-NN, filter by hours, rank by walking time | | Planned; External (verified safe-point data) |
+| Proposal requirement | Implementation | Test | Status |
+|---|---|---|---|
+| Hold-to-confirm SOS (about 3 s, prevents accidental activation) | `mobile/lib/widgets/hold_to_confirm_button.dart`, `features/sos/sos_screen.dart` | `sos_widgets_test.dart` (fires at 3 s, early release cancels, disabled) | Done |
+| SOS captures GPS, identity (session) and timestamp | `POST /api/sos`, `server/src/modules/sos/sosService.js` | `sos.test.js` "stores the alert with identity, GPS and time" | Done |
+| SOS works without a GPS fix | App sends after 6 s without GPS; first location received becomes the alert location | `sos.test.js` "goes through without GPS", `sos_controller_test.dart` | Done |
+| Duplicate protection | Idempotency key per press + one open SOS per user (unique indexes) | `sos.test.js` "a retried request never creates a second alert" (incl. concurrent) | Done |
+| Reliable delivery on a bad connection | App retries with back-off using the same key | `sos_controller_test.dart` "keeps retrying … same request id" | Done |
+| SOS reaches the Security Dashboard immediately | `publisher.alertNew`, dashboard `useEmergencies` | `sos.test.js`, `socket.test.js` | Done |
+| Live location during an SOS (security + trusted contacts) | `sos:location` socket event, HTTP batch fallback, SOS share link `/t/<token>` | `socket.test.js` "streams SOS positions …", `sos.test.js` live link | Done |
+| Trusted contacts alerted in parallel (SMS/Telegram/Email) | `sosMessage` via dispatcher | `sos.test.js` | Done (code); External (credentials) |
+| One-tap call to USM Security hotline, 999 fallback | `services/phone_dialer.dart`, numbers in `AppConfig` (overridable) | Manual | Done (manual); opens dialer, see A13 |
+| Silent SOS | `trigger_type = SILENT`, no vibration, no call prompt, contacts told not to call | `sos.test.js`, `sos_controller_test.dart` | Done |
+| User marks themselves safe | `POST /api/sos/:id/safe`; stops sharing, notifies contacts and security; alert stays for security | `sos.test.js` "user marks themselves safe" | Done |
+| Nearest safe points with name, category, hours, phone, walking directions | `GET /api/safe-points/nearest`, `/directions` (OSRM steps), `features/safe_points/safe_points_screen.dart` | `safePoints.test.js` | Done |
+| Filter by operating hours before ranking | SQL `public.safe_point_is_open` (Malaysia time, ranges across midnight) | `openingHours.test.js` (JS and SQL agree over a week for every schedule) | Done |
+| PostGIS k-NN | `ORDER BY location <-> point` with GiST index | `safePoints.test.js` | Done |
+| Rank by actual walking time | OSRM table service (one request for all candidates), straight-line fallback | `safePoints.test.js` "…then ranks by walking time" | Done |
+| Verified safe point data | 21 points supplied by the team, loaded by migration `20261107000200` without coordinates | `safePoints.test.js` "loads the 21 supplied safe points without inventing locations" | Partial: locations must be pinned by staff (see A14) |
+| SOS during a journey | Alert linked to the open trip; journey link shows the SOS | `sos.test.js` | Done |
 
 ### Module 3: Incident reporting and safety map
 
@@ -93,10 +106,10 @@ Test files: server tests are in `apps/server/test/`, Flutter tests in
 | Proposal requirement | Implementation | Status |
 |---|---|---|
 | Staff login with admin email allow-list, Supabase Auth, RBAC, RLS | `security_staff`, `is_security_staff()`, `requireSecurityStaff`, dashboard login | Done (tests: `tripsApi.test.js`, `trackingAndRls.test.js`) |
-| Emergency alert with alarm, live location, identity, time, type | `EmergenciesPage.jsx`, `alarm.js` | Done for ETA escalations (manual check) |
-| Status workflow Received, On the Way, Arrived, Resolved | Schema and RLS ready (`alert_status`, `alert_status_log`) | Planned |
+| Emergency alert with alarm, live location, identity, time, type | `EmergenciesPage.jsx`, `alarm.js` | Done for SOS and overdue journeys (browser-tested) |
+| Status workflow Received, On the Way, Arrived, Resolved | `POST /api/staff/alerts/:id/status`, `ResponsePanel.jsx`, timeline with officer and note; resolving an overdue alert closes the journey | Done (tests: `sos.test.js` workflow, `socket.test.js`) |
 | Report management, grouping, verification | | Planned |
-| Safe haven and campus resource management | | Planned |
+| Safe haven and campus resource management | `SafePointsPage.jsx` (pin on map, hours editor, contacts, activate), `/api/staff/safe-points` | Done (tests: `safePoints.test.js` management) |
 | Security announcements | | Planned |
 | Analytics from real data | | Planned |
 
@@ -116,8 +129,8 @@ every column added beyond the ERD.
 | SMTP account | Email alerts | `apps/server/.env` |
 | Firebase project + service account | Push notifications (grace prompt) | server `.env` + mobile dart-defines |
 | OSRM foot-routing server for production | Routing beyond fair-use demo limits | `OSRM_BASE_URL` |
-| Confirmed USM Security hotline number | Module 2 calling | Config (Module 2). Proposal Figure 1.1 shows +604-653 4333/4334 and emergency line +604-653 4999; confirm with JKUSM before use |
-| Verified safe-point list (name, location, hours, phone) | Module 2 navigator | Entered by staff through Module 4 |
+| USM Security hotline number | Module 2 calling | +604-653 4999 (proposal Figure 1.1 and team list, 7 Nov 2026); `USM_SECURITY_EMERGENCY` dart-define |
+| Map location of each safe point | Module 2 navigator | Pin in the dashboard (Safe points page); the supplied list has no coordinates |
 | Institutional approval to connect to JKUSM | Real deployment | Supervisor / JKUSM |
 
 ## 6. Ambiguities and decisions
@@ -136,21 +149,32 @@ every column added beyond the ERD.
 | A10 | Existing `docs/03-data-contract.md` (camelCase, different enum values) predates the proposal ERD | The ERD (snake_case) is followed; `docs/03` updated to point to it |
 | A11 | `docs/02` says alerts never include victim names; the proposal says SOS alerts include identity for security | Security staff see identity (proposal); trusted-contact link shows only the traveller's name; no identity in public views |
 | A12 | Should only `@usm.my` / `@student.usm.my` emails be allowed? | Configurable `ALLOWED_USER_EMAIL_DOMAINS`; empty for demos |
+| A13 | "One-tap calling": Android and iOS do not let an app place a call without the user confirming in the dialer (direct calling needs the CALL_PHONE permission and is refused by iOS) | SafeWalk opens the dialer with the number filled in: one tap in SafeWalk plus the dialer's call button |
+| A14 | The safe point list has no coordinates | Loaded without locations; staff pin each on the dashboard map. No coordinates are guessed |
+| A15 | Pusat Sejahtera lists +604-693 3999 / 4900, unlike the other 653 numbers; some hours have exceptions (public holidays, semester break, Friday lunch) | Stored as supplied; exceptions shown as notes; team to re-check the 693 numbers |
+| A16 | ERD SAFE_POINT has one `name_and_category` column | Split into `name` + `category` so the app can filter and colour by category |
+| A17 | Should an SOS notify trusted contacts? Module 2 text mentions only security; 5.2.3 2B/2C say SOS alerts and live location go to configured channels and contacts | Contacts are notified and get a live link |
+| A18 | What closes an SOS: the user or security? | The user can mark themselves safe (sharing stops), but only security resolves the alert |
 
 ## 7. Completion checklist (proposal acceptance criteria)
 
 | # | Criterion | State |
 |---|---|---|
-| 1 | All four modules implemented | Module 1 done; Modules 2 to 4 planned |
+| 1 | All four modules implemented | Modules 1 and 2 done; Module 4 partly (response workflow, safe points); Module 3 and rest of 4 planned |
 | 3 | Mobile app talks to the backend | Done (REST + Socket.io; web build verified against local server) |
 | 4 | Dashboard receives real-time information | Done for ETA escalations |
 | 5 | Tracking page works through a secure link | Done |
 | 6 | ETA watchdog runs server-side | Done |
 | 7 | Three-minute grace period | Done (`GRACE_PERIOD_SECONDS=180`) |
 | 8 | Emergency escalation | Done |
-| 9-18 | SOS, safe points, reports, auto-verification, staff management, announcements | Planned |
+| 9 | Hold-to-confirm SOS | Done |
+| 10 | Silent SOS | Done |
+| 11 | Safe point navigation uses spatial queries | Done (k-NN + opening hours + walking time) |
+| 15 | Security manage emergency responses | Done |
+| 17 | Safe points can be managed | Done |
+| 12-14, 16, 18 | Reports, auto-verification, report management, announcements | Planned (Modules 3-4) |
 | 19 | Database security policies | Done for current tables (RLS tested) |
 | 20 | Palette followed | Done (tokens in `packages/shared/styles/tokens.css`, `apps/mobile/lib/core/theme.dart`) |
 | 21 | Responsive | Tracking page checked at phone and desktop widths; dashboard has a tablet layout |
-| 22 | Important functionality tested | 47 server tests, 14 Flutter tests |
+| 22 | Important functionality tested | 75 server tests, 31 Flutter tests |
 | 24 | No fabricated integrations or statistics | Unconfigured channels report "skipped"; sample data is labelled |

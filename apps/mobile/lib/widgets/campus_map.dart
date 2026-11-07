@@ -17,6 +17,7 @@ class CampusMap extends StatelessWidget {
     this.onTap,
     this.initialCenter,
     this.initialZoom = 16,
+    this.markers = const [],
   });
 
   final MapController? controller;
@@ -26,6 +27,9 @@ class CampusMap extends StatelessWidget {
   final void Function(LatLng point)? onTap;
   final LatLng? initialCenter;
   final double initialZoom;
+
+  /// Additional markers (e.g. safe points), drawn under the user's position.
+  final List<Marker> markers;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +55,7 @@ class CampusMap extends StatelessWidget {
             Polyline(points: route, color: SwColors.secondary, strokeWidth: 5),
           ]),
         MarkerLayer(markers: [
+          ...markers,
           if (destination != null)
             Marker(
               point: destination!,

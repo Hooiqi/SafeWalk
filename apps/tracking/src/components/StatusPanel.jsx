@@ -28,11 +28,13 @@ function headline(view, now) {
     case 'COMPLETED':
       return {
         tone: 'done',
-        badge: view.end_reason === 'ARRIVED' ? 'Arrived safely' : 'Confirmed safe',
+        badge: view.end_reason === 'ARRIVED' ? 'Arrived safely' : view.end_reason === 'RESOLVED_BY_SECURITY' ? 'Resolved by security' : 'Confirmed safe',
         title:
           view.end_reason === 'ARRIVED'
             ? `Arrived safely at ${formatTime(view.ended_at)}`
-            : `${view.traveller_name} confirmed they are safe at ${formatTime(view.ended_at)}`,
+            : view.end_reason === 'RESOLVED_BY_SECURITY'
+              ? `USM Security closed this alert at ${formatTime(view.ended_at)}`
+              : `${view.traveller_name} confirmed they are safe at ${formatTime(view.ended_at)}`,
         detail: 'Live tracking has ended for this journey.',
       };
     case 'CANCELLED':
@@ -70,6 +72,12 @@ export default function StatusPanel({ view, now, connection }) {
       <span className={`sw-badge sw-badge--${h.tone}`}>{h.badge}</span>
       <h1 className="panel__title">{h.title}</h1>
       <p className="panel__detail">{h.detail}</p>
+
+      {view.sos && view.sos.status !== 'RESOLVED' && !view.sos.user_safe_at && (
+        <p className="notice notice--danger" role="alert">
+          {view.traveller_name} sent an SOS at {formatTime(view.sos.triggered_at)} during this journey. USM Security has been alerted.
+        </p>
+      )}
 
       {open && view.signal_lost_at && (
         <p className="notice" role="status">

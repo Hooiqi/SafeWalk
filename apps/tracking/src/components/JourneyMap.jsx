@@ -41,23 +41,28 @@ export default function JourneyMap({ view }) {
   );
   const trail = useMemo(() => view.trail.map(toLatLng), [view.trail]);
   const current = view.last_location ? toLatLng(view.last_location) : null;
-  const destination = toLatLng(view.destination);
-  const bounds = useMemo(() => L.latLngBounds([...route, ...trail, destination]), [route, trail, destination]);
+  const destination = view.destination ? toLatLng(view.destination) : null;
+  const bounds = useMemo(
+    () => L.latLngBounds([...route, ...trail, ...(destination ? [destination] : []), ...(current ? [current] : [])]),
+    [route, trail, destination, current],
+  );
   const ended = view.status === 'COMPLETED' || view.status === 'CANCELLED';
-  const emergency = view.status === 'ESCALATED';
+  const emergency = view.status === 'ESCALATED' || view.kind === 'SOS';
 
   return (
-    <MapContainer className="map" center={destination} zoom={16} zoomControl attributionControl>
+    <MapContainer className="map" center={destination ?? current ?? [5.3559, 100.3025]} zoom={16} zoomControl attributionControl>
       <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} className="sw-dark-tiles" maxZoom={19} />
       {route.length > 1 && (
         <Polyline positions={route} pathOptions={{ color: '#A89FA3', weight: 4, opacity: 0.55, dashArray: '6 8' }} />
       )}
       {trail.length > 1 && <Polyline positions={trail} pathOptions={{ color: '#FFA372', weight: 4, opacity: 0.95 }} />}
+      {destination && (
       <CircleMarker center={destination} radius={9} pathOptions={{ color: '#FDF9FA', weight: 3, fillColor: '#120F11', fillOpacity: 1 }}>
         <Tooltip direction="top" offset={[0, -8]} permanent={false}>
           {view.destination.label ?? 'Destination'}
         </Tooltip>
       </CircleMarker>
+      )}
       {current && (
         <CircleMarker
           center={current}

@@ -79,3 +79,63 @@ class ProfileRepository {
 
   Future<void> registerPushToken(String token) => _api.patch('/api/me', {'device_fcm_token': token});
 }
+
+class SafePointsRepository {
+  SafePointsRepository(this._api);
+  final ApiClient _api;
+
+  String _at(LatLng p) => 'lat=${p.latitude}&lng=${p.longitude}';
+
+  /// All active safe points on the map, and how many official ones still need a location.
+  Future<({List<SafePoint> points, int pendingLocation})> all() async {
+    final body = await _api.get('/api/safe-points') as Map<String, dynamic>;
+    return (
+      points: [for (final p in body['safe_points'] as List) SafePoint.fromJson(p as Map<String, dynamic>)],
+      pendingLocation: (body['pending_location_count'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  /// Open safe points nearest to [from], ranked by walking time.
+  Future<List<SafePoint>> nearest(LatLng from, {int limit = 5}) async {
+    final body = await _api.get('/api/safe-points/nearest?${_at(from)}&limit=$limit') as Map<String, dynamic>;
+    return [for (final p in body['safe_points'] as List) SafePoint.fromJson(p as Map<String, dynamic>)];
+  }
+
+  Future<RoutePreview> directions(String safePointId, LatLng from) async {
+    final body = await _api.get('/api/safe-points/$safePointId/directions?${_at(from)}') as Map<String, dynamic>;
+    return RoutePreview.fromJson(body['route'] as Map<String, dynamic>);
+  }
+}
+
+class SosRepository {
+  SosRepository(this._api);
+  final ApiClient _api;
+
+  Future<SosAlert> create({
+    required bool silent,
+    required String requestId,
+    LatLng? location,
+    double? accuracyM,
+    int? batteryLevel,
+    DateTime? recordedAt,
+  }) async =>
+      SosAlert.fromJson(await _api.post('/api/sos', {
+        'trigger_type': silent ? 'SILENT' : 'HOLD',
+        'client_request_id': requestId,
+        if (location != null) 'location': pointJson(location),
+        'accuracy_m': ?accuracyM,
+        'battery_level': ?batteryLevel,
+        if (location != null && recordedAt != null) 'recorded_at': recordedAt.toUtc().toIso8601String(),
+      }) as Map<String, dynamic>);
+
+  Future<SosAlert?> active() async {
+    final body = await _api.get('/api/sos/active') as Map<String, dynamic>;
+    return body['alert'] == null ? null : SosAlert.fromJson(body['alert'] as Map<String, dynamic>);
+  }
+
+  Future<SosAlert> markSafe(String alertId) async =>
+      SosAlert.fromJson(await _api.post('/api/sos/$alertId/safe') as Map<String, dynamic>);
+
+  Future<void> uploadLocations(String alertId, List<Map<String, dynamic>> samples) =>
+      _api.post('/api/sos/$alertId/locations', {'samples': samples});
+}

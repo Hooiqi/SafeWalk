@@ -39,18 +39,31 @@ class TrustedContact {
 }
 
 class RoutePreview {
-  const RoutePreview({required this.points, required this.distanceM, required this.duration, required this.isEstimate});
+  const RoutePreview({
+    required this.points,
+    required this.distanceM,
+    required this.duration,
+    required this.isEstimate,
+    this.steps = const [],
+  });
 
   factory RoutePreview.fromJson(Map<String, dynamic> j) => RoutePreview(
         points: _lineString(j['geometry']),
         distanceM: (j['distance_m'] as num).toInt(),
         duration: Duration(seconds: (j['duration_s'] as num).toInt()),
         isEstimate: j['source'] == 'STRAIGHT_LINE_ESTIMATE',
+        steps: [
+          for (final s in (j['steps'] as List? ?? const []))
+            RouteStep((s as Map)['instruction'] as String, ((s['distance_m'] as num?) ?? 0).toInt()),
+        ],
       );
 
   final List<LatLng> points;
   final int distanceM;
   final Duration duration;
+
+  /// Turn-by-turn walking directions (empty for straight-line estimates).
+  final List<RouteStep> steps;
 
   /// True when OSRM was unreachable and the server used a straight-line estimate.
   final bool isEstimate;
@@ -200,4 +213,178 @@ class UserProfile {
   final String email;
   final String? matricOrStaffId;
   final String? phoneNumber;
+}
+
+class RouteStep {
+  const RouteStep(this.instruction, this.distanceM);
+  final String instruction;
+  final int distanceM;
+}
+
+// ---- Module 2: safe points --------------------------------------------------
+
+class SafePointCategory {
+  const SafePointCategory._();
+  static const securityPost = 'SECURITY_POST';
+  static const medical = 'MEDICAL';
+  static const studyArea = 'STUDY_AREA';
+  static const residentialCollege = 'RESIDENTIAL_COLLEGE';
+  static const publicBuilding = 'PUBLIC_BUILDING';
+  static const policeStation = 'POLICE_STATION';
+
+  static String label(String category) => switch (category) {
+        securityPost => 'Security post',
+        medical => 'Medical',
+        studyArea => 'Study area',
+        residentialCollege => 'Residential college',
+        publicBuilding => 'Public building',
+        policeStation => 'Police station',
+        _ => category,
+      };
+}
+
+class OpeningStatus {
+  const OpeningStatus({required this.isOpen, required this.always, this.closesAt, this.opensAt});
+
+  factory OpeningStatus.fromJson(Map<String, dynamic> j) => OpeningStatus(
+        isOpen: j['is_open'] as bool,
+        always: j['always'] as bool? ?? false,
+        closesAt: _date(j['closes_at']),
+        opensAt: _date(j['opens_at']),
+      );
+
+  final bool isOpen;
+  final bool always;
+  final DateTime? closesAt;
+  final DateTime? opensAt;
+}
+
+class WalkingEstimate {
+  const WalkingEstimate({required this.distanceM, required this.duration, required this.isEstimate});
+
+  factory WalkingEstimate.fromJson(Map<String, dynamic> j) => WalkingEstimate(
+        distanceM: (j['distance_m'] as num).toInt(),
+        duration: Duration(seconds: (j['duration_s'] as num).toInt()),
+        isEstimate: j['source'] == 'STRAIGHT_LINE_ESTIMATE',
+      );
+
+  final int distanceM;
+  final Duration duration;
+  final bool isEstimate;
+}
+
+class SafePoint {
+  const SafePoint({
+    required this.id,
+    required this.name,
+    required this.category,
+    required this.location,
+    required this.operatingHours,
+    required this.opening,
+    this.locationDescription,
+    this.contactPhone,
+    this.contactNotes,
+    this.notes,
+    this.walking,
+  });
+
+  factory SafePoint.fromJson(Map<String, dynamic> j) => SafePoint(
+        id: j['safe_point_id'] as String,
+        name: j['name'] as String,
+        category: j['category'] as String,
+        location: _point(j['location'] as Map<String, dynamic>),
+        locationDescription: j['location_description'] as String?,
+        operatingHours: j['operating_hours'] as String,
+        opening: OpeningStatus.fromJson(j['opening'] as Map<String, dynamic>),
+        contactPhone: j['contact_phone'] as String?,
+        contactNotes: j['contact_notes'] as String?,
+        notes: j['notes'] as String?,
+        walking: j['walking'] == null ? null : WalkingEstimate.fromJson(j['walking'] as Map<String, dynamic>),
+      );
+
+  final String id;
+  final String name;
+  final String category;
+  final LatLng location;
+  final String? locationDescription;
+  final String operatingHours;
+  final OpeningStatus opening;
+  final String? contactPhone;
+  final String? contactNotes;
+  final String? notes;
+
+  /// Only present in nearest-safe-point results.
+  final WalkingEstimate? walking;
+}
+
+// ---- Module 2: SOS ------------------------------------------------------------
+
+class StatusEntry {
+  const StatusEntry({required this.newStatus, required this.at, this.staffName, this.note});
+
+  factory StatusEntry.fromJson(Map<String, dynamic> j) => StatusEntry(
+        newStatus: j['new_status'] as String,
+        at: DateTime.parse(j['updated_at'] as String),
+        staffName: j['staff_name'] as String?,
+        note: j['note'] as String?,
+      );
+
+  final String newStatus;
+  final DateTime at;
+  final String? staffName;
+  final String? note;
+}
+
+class SosAlert {
+  const SosAlert({
+    required this.id,
+    required this.triggerType,
+    required this.status,
+    required this.triggeredAt,
+    this.resolvedAt,
+    this.userSafeAt,
+    this.trackingUrl,
+    this.history = const [],
+  });
+
+  factory SosAlert.fromJson(Map<String, dynamic> j) => SosAlert(
+        id: j['alert_id'] as String,
+        triggerType: j['trigger_type'] as String,
+        status: j['status'] as String,
+        triggeredAt: DateTime.parse(j['triggered_at'] as String),
+        resolvedAt: _date(j['resolved_at']),
+        userSafeAt: _date(j['user_safe_at']),
+        trackingUrl: j['tracking_url'] as String?,
+        history: [for (final h in (j['status_history'] as List? ?? const [])) StatusEntry.fromJson(h as Map<String, dynamic>)],
+      );
+
+  final String id;
+  final String triggerType; // HOLD | SILENT
+  final String status; // NEW | RECEIVED | ON_THE_WAY | ARRIVED | RESOLVED
+  final DateTime triggeredAt;
+  final DateTime? resolvedAt;
+  final DateTime? userSafeAt;
+  final String? trackingUrl;
+  final List<StatusEntry> history;
+
+  bool get isSilent => triggerType == 'SILENT';
+
+  /// Still sharing location: not resolved by security and not marked safe.
+  bool get isOpen => status != 'RESOLVED' && userSafeAt == null;
+
+  /// Applies an `alert:status` socket event.
+  SosAlert withStatusEvent(Map<String, dynamic> e) {
+    final latest = e['latest'] is Map ? StatusEntry.fromJson(Map<String, dynamic>.from(e['latest'] as Map)) : null;
+    final duplicate = latest != null && history.any((h) => h.newStatus == latest.newStatus && h.at == latest.at);
+    return SosAlert(
+      id: id,
+      triggerType: triggerType,
+      status: e['status'] as String? ?? status,
+      triggeredAt: triggeredAt,
+      resolvedAt: _date(e['resolved_at']) ?? resolvedAt,
+      userSafeAt: _date(e['user_safe_at']) ?? userSafeAt,
+      trackingUrl: trackingUrl,
+      history: latest == null || duplicate ? history : [...history, latest],
+    );
+  }
 }

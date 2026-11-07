@@ -61,6 +61,33 @@ export function useTrackingSession(token) {
       }
     });
 
+    const applyPosition = (p) =>
+      setView((v) => {
+        if (!v) return v;
+        const current = v.last_location?.recorded_at;
+        if (current && new Date(p.recorded_at) <= new Date(current)) return v; // stale sample
+        const point = { lat: p.lat, lng: p.lng, recorded_at: p.recorded_at };
+        return {
+          ...v,
+          last_location: { ...point, battery_level: p.battery_level, accuracy_m: p.accuracy_m },
+          last_heartbeat_at: p.recorded_at,
+          signal_lost_at: null,
+          trail: [...(v.trail ?? []), point],
+        };
+      });
+    // SOS links receive alert:position; journey links trip:position.
+    socket.on(E.ALERT_POSITION, once(applyPosition));
+    socket.on(
+      E.ALERT_STATUS,
+      once((p) =>
+        setView((v) => {
+          if (!v) return v;
+          if (v.kind === 'SOS') return { ...v, status: p.status, resolved_at: p.resolved_at, user_safe_at: p.user_safe_at };
+          // An SOS (or overdue alert) linked to this journey changed.
+          return p.trigger_type === 'ETA' ? { ...v, security_status: p.status } : { ...v, sos: { ...(v.sos ?? {}), status: p.status, user_safe_at: p.user_safe_at } };
+        }),
+      ),
+    );
     socket.on(
       E.TRIP_POSITION,
       once((p) =>

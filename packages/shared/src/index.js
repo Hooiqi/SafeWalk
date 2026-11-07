@@ -21,6 +21,7 @@ export const TRIP_END_REASON = Object.freeze({
   ARRIVED: 'ARRIVED',
   SAFE_CONFIRMED: 'SAFE_CONFIRMED',
   CANCELLED: 'CANCELLED',
+  RESOLVED_BY_SECURITY: 'RESOLVED_BY_SECURITY',
 });
 
 export const ALERT_TRIGGER = Object.freeze({
@@ -37,11 +38,24 @@ export const ALERT_STATUS = Object.freeze({
   RESOLVED: 'RESOLVED',
 });
 
+/** Security response workflow order (proposal Module 4): statuses only move forward. */
+export const ALERT_STATUS_ORDER = Object.freeze(['NEW', 'RECEIVED', 'ON_THE_WAY', 'ARRIVED', 'RESOLVED']);
+
+export const SAFE_POINT_CATEGORY = Object.freeze({
+  SECURITY_POST: 'SECURITY_POST',
+  MEDICAL: 'MEDICAL',
+  STUDY_AREA: 'STUDY_AREA',
+  RESIDENTIAL_COLLEGE: 'RESIDENTIAL_COLLEGE',
+  PUBLIC_BUILDING: 'PUBLIC_BUILDING',
+  POLICE_STATION: 'POLICE_STATION',
+});
+
 /** Socket.io event names. Server events carry { event_id, emitted_at, ...data }. */
 export const SOCKET_EVENTS = Object.freeze({
   // client -> server
   TRIP_LOCATION: 'trip:location',
   TRIP_HEARTBEAT: 'trip:heartbeat',
+  SOS_LOCATION: 'sos:location',
   // server -> client
   TRIP_STATUS: 'trip:status',
   TRIP_GRACE_PROMPT: 'trip:grace_prompt',
@@ -49,6 +63,7 @@ export const SOCKET_EVENTS = Object.freeze({
   TRIP_SIGNAL: 'trip:signal',
   ALERT_NEW: 'alert:new',
   ALERT_POSITION: 'alert:position',
+  ALERT_STATUS: 'alert:status',
   AUTH_EXPIRED: 'auth:expired',
 });
 

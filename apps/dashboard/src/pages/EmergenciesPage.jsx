@@ -14,7 +14,7 @@ function useNow() {
 }
 
 export default function EmergenciesPage({ accessToken, emergencies }) {
-  const { alerts, status, error, connection, incoming, reload, setAlerts } = emergencies;
+  const { alerts, status, error, connection, incoming, reload, setAlerts, replaceAlert } = emergencies;
   const [selectedId, setSelectedId] = useState(null);
   const [soundOn, setSoundOn] = useState(false);
   const alarm = useRef(createAlarm()).current;
@@ -39,7 +39,7 @@ export default function EmergenciesPage({ accessToken, emergencies }) {
 
   // Load route history for the selected alert.
   const selectedKey = selected?.alert_id;
-  const hasTrail = Boolean(selected?.trip?.trail);
+  const hasTrail = Boolean(selected?.trail);
   useEffect(() => {
     if (!selectedKey || hasTrail) return;
     const controller = new AbortController();
@@ -59,7 +59,7 @@ export default function EmergenciesPage({ accessToken, emergencies }) {
       <header className="page__header">
         <div>
           <h1>Live emergencies</h1>
-          <p className="sw-muted">Overdue journeys escalated by the SafeWalk ETA watchdog.</p>
+          <p className="sw-muted">SOS alerts and overdue journeys, newest first.</p>
         </div>
         <div className="page__actions">
           <span className={`conn conn--${connection}`}>{connection === 'live' ? 'Live' : 'Reconnecting…'}</span>
@@ -79,7 +79,7 @@ export default function EmergenciesPage({ accessToken, emergencies }) {
       {unacknowledged > 0 && (
         <div className="banner" role="alert">
           <strong>{unacknowledged} unacknowledged emergency{unacknowledged > 1 ? ' alerts' : ' alert'}</strong>
-          <span>Review the person&apos;s last known location and dispatch a patrol.</span>
+          <span>Open it, press &ldquo;Received alert&rdquo; and dispatch a patrol. The alarm stops once every alert is acknowledged.</span>
         </div>
       )}
 
@@ -93,13 +93,13 @@ export default function EmergenciesPage({ accessToken, emergencies }) {
       {status === 'ready' && alerts.length === 0 && (
         <div className="state state--empty">
           <h2>No open emergencies</h2>
-          <p className="sw-muted">New overdue-journey alerts appear here immediately, with an alarm if sound is enabled.</p>
+          <p className="sw-muted">New SOS and overdue-journey alerts appear here immediately, with an alarm if sound is enabled.</p>
         </div>
       )}
       {status === 'ready' && alerts.length > 0 && (
         <div className="split">
           <AlertList alerts={alerts} selectedId={selected?.alert_id} onSelect={setSelectedId} now={now} />
-          {selected && <AlertDetail alert={selected} now={now} />}
+          {selected && <AlertDetail alert={selected} now={now} accessToken={accessToken} onUpdated={replaceAlert} />}
         </div>
       )}
     </div>

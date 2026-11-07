@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import JourneyMap from './components/JourneyMap.jsx';
 import Message from './components/Message.jsx';
+import SosPanel from './components/SosPanel.jsx';
 import StatusPanel from './components/StatusPanel.jsx';
 import { useTrackingSession } from './useTrackingSession.js';
 
@@ -47,7 +48,11 @@ export default function TrackingPage() {
   return (
     <main className="layout">
       <JourneyMap view={view} />
-      <StatusPanel view={view} now={now} connection={connection} />
+      {view.kind === 'SOS' ? (
+        <SosPanel view={view} now={now} connection={connection} />
+      ) : (
+        <StatusPanel view={view} now={now} connection={connection} />
+      )}
     </main>
   );
 }

@@ -7,6 +7,7 @@ import '../../core/formatting.dart';
 import '../../core/theme.dart';
 import '../../data/models.dart';
 import '../../data/repositories.dart';
+import '../../services/sos_controller.dart';
 import '../../services/trip_tracker.dart';
 import '../../widgets/common.dart';
 import '../contacts/contacts_controller.dart';
@@ -46,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final text = Theme.of(context).textTheme;
     final trip = context.watch<TripTracker>().trip;
     final contacts = context.watch<ContactsController>();
+    final sos = context.watch<SosController>();
     final firstName = _profile?.fullName.split(' ').first;
 
     return Scaffold(
@@ -63,11 +65,26 @@ class _HomeScreenState extends State<HomeScreen> {
               Card(child: ErrorView(message: _error!, onRetry: _load)),
               const SizedBox(height: 16),
             ],
+            if (sos.phase == SosPhase.sending || sos.phase == SosPhase.active) ...[
+              _SosActiveCard(sending: sos.phase == SosPhase.sending),
+              const SizedBox(height: 16),
+            ],
             if (trip != null && trip.isOpen)
               _ActiveJourneyCard(trip: trip)
             else
               _StartCard(hasContacts: contacts.contacts.isNotEmpty || !contacts.loaded),
             const SizedBox(height: 16),
+            Card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                leading: const Icon(Icons.shield_outlined, color: SwColors.secondary),
+                title: const Text('Nearest safe point'),
+                subtitle: Text('Security posts, colleges and 24-hour places that are open now', style: text.bodySmall),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.go('/safe-points'),
+              ),
+            ),
+            const SizedBox(height: 8),
             Card(
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -88,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 leading: const Icon(Icons.history_rounded, color: SwColors.secondary),
                 title: const Text('Journey history'),
                 trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => context.go('/history'),
+                onTap: () => context.push('/history'),
               ),
             ),
           ]),
@@ -96,6 +113,24 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+class _SosActiveCard extends StatelessWidget {
+  const _SosActiveCard({required this.sending});
+  final bool sending;
+
+  @override
+  Widget build(BuildContext context) => Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: SwColors.primary, width: 2)),
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(16),
+          leading: const Icon(Icons.sos_rounded, color: SwColors.primary, size: 32),
+          title: Text(sending ? 'Sending your SOS…' : 'Your SOS is active', style: const TextStyle(fontWeight: FontWeight.w700)),
+          subtitle: const Text('Open to see updates from USM Security'),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: () => context.go('/sos'),
+        ),
+      );
 }
 
 class _StartCard extends StatelessWidget {

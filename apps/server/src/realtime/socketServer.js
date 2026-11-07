@@ -7,19 +7,21 @@ import { locationSampleSchema } from '../modules/trips/tripRoutes.js';
 import { rooms } from './publisher.js';
 
 const locationEventSchema = z.object({ trip_id: z.uuid(), sample: locationSampleSchema }).strict();
+const sosLocationEventSchema = z.object({ alert_id: z.uuid(), sample: locationSampleSchema }).strict();
 const MAX_TIMER_MS = 2_147_000_000; // setTimeout limit
 
 /**
  * Socket.io server (proposal 5.2.3 2C). Three kinds of client connect:
  *   - app users (Supabase JWT)      -> room user:<id>; may stream their own trip GPS
  *   - security staff (Supabase JWT) -> room staff
- *   - trusted contacts (share token) -> room trip:<id> for exactly one trip
+ *   - trusted contacts (share token) -> room trip:<id> or alert:<id> for exactly one
+ *     journey or SOS
  * Rooms are assigned by the server after authentication; there is no
  * client-side "join room" event, so nobody can subscribe to a trip or the
  * staff channel they are not entitled to.
  */
 export function attachSocketServer(httpServer, deps) {
-  const { config, pool, verifyToken, trackingService, tripService, publisher, logger } = deps;
+  const { config, pool, verifyToken, trackingService, tripService, sosService, publisher, logger } = deps;
   const io = new Server(httpServer, {
     cors: { origin: config.corsOrigins },
     // Recover missed events after short disconnects (e.g. switching networks).
@@ -38,9 +40,9 @@ export function attachSocketServer(httpServer, deps) {
         return next();
       }
       if (typeof shareToken === 'string' && shareToken) {
-        const trip = await trackingService.resolveToken(shareToken);
-        socket.data.viewerTripId = trip.trip_id;
-        socket.data.expiresAt = trip.share_expires_at ? new Date(trip.share_expires_at).getTime() : null;
+        const link = await trackingService.resolveToken(shareToken);
+        socket.data.viewerRoom = link.kind === 'TRIP' ? rooms.tripViewers(link.id) : rooms.alertViewers(link.id);
+        socket.data.expiresAt = link.expiresAt ? new Date(link.expiresAt).getTime() : null;
         return next();
       }
       next(new Error('UNAUTHORIZED'));
@@ -50,10 +52,10 @@ export function attachSocketServer(httpServer, deps) {
   });
 
   io.on('connection', (socket) => {
-    const { identity, viewerTripId, expiresAt } = socket.data;
+    const { identity, viewerRoom, expiresAt } = socket.data;
     if (identity?.isAppUser) socket.join(rooms.user(identity.userId));
     if (identity?.isStaff) socket.join(rooms.staff);
-    if (viewerTripId) socket.join(rooms.tripViewers(viewerTripId));
+    if (viewerRoom) socket.join(viewerRoom);
 
     // Disconnect when the session token (or tracking link) expires; the
     // client reconnects with a refreshed token.
@@ -83,6 +85,21 @@ export function attachSocketServer(httpServer, deps) {
     };
     socket.on(E.TRIP_LOCATION, handleSample(false));
     socket.on(E.TRIP_HEARTBEAT, handleSample(true));
+
+    // GPS during an SOS, from the person who raised it.
+    socket.on(E.SOS_LOCATION, async (payload, ack) => {
+      const reply = typeof ack === 'function' ? ack : () => {};
+      if (!identity?.isAppUser) return reply({ ok: false, error: 'FORBIDDEN' });
+      const parsed = sosLocationEventSchema.safeParse(payload);
+      if (!parsed.success) return reply({ ok: false, error: 'BAD_REQUEST' });
+      try {
+        const result = await sosService.recordLocations(identity, parsed.data.alert_id, [parsed.data.sample]);
+        reply({ ok: true, ...result });
+      } catch (err) {
+        if (!(err instanceof HttpError)) logger.error({ err }, 'socket SOS location error');
+        reply({ ok: false, error: err instanceof HttpError ? err.code : 'INTERNAL' });
+      }
+    });
   });
 
   publisher.attach(io);

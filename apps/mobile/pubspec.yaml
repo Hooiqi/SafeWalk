@@ -22,6 +22,7 @@ dependencies:
   share_plus: ^13.3.1
   socket_io_client: ^3.1.6
   supabase_flutter: ^2.18.3
+  url_launcher: ^6.3.3
 
 dev_dependencies:
   flutter_test:

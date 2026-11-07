@@ -10,6 +10,8 @@ import { contactRoutes } from './modules/contacts/contactRoutes.js';
 import { tripRoutes } from './modules/trips/tripRoutes.js';
 import { userRoutes } from './modules/users/userRoutes.js';
 import { staffRoutes } from './modules/alerts/staffRoutes.js';
+import { safePointRoutes, staffSafePointRoutes } from './modules/safePoints/safePointRoutes.js';
+import { sosRoutes } from './modules/sos/sosRoutes.js';
 
 /** Builds the Express application. All dependencies are injected for testing. */
 export function createApp(deps) {
@@ -43,6 +45,9 @@ export function createApp(deps) {
   app.use('/api/me', auth, userRoutes(deps));
   app.use('/api/contacts', auth, contactRoutes(deps));
   app.use('/api/trips', auth, tripRoutes(deps));
+  app.use('/api/sos', auth, sosRoutes(deps));
+  app.use('/api/safe-points', auth, safePointRoutes(deps));
+  app.use('/api/staff/safe-points', auth, staffSafePointRoutes(deps));
   app.use('/api/staff', auth, staffRoutes(deps));
 
   app.use((_req, _res, next) => next(notFound('Route not found')));
