@@ -171,6 +171,32 @@ describe('Socket.io real-time channel', () => {
     assert.equal(status.latest.staff_name, 'Test Officer');
   });
 
+  it('delivers incident reports to security, status to the reporter and map updates to every app user', async () => {
+    const app = createApp(deps);
+    const viewer = await createUser(deps.pool, { name: 'Viewer Sample' });
+    const staffSocket = await open({ token: officer.token });
+    const reporterSocket = await open({ token: student.token });
+    const viewerSocket = await open({ token: viewer.token });
+
+    const fresh = next(staffSocket, 'incident:new');
+    const report = await request(app)
+      .post('/api/incidents')
+      .set({ Authorization: `Bearer ${student.token}` })
+      .send({ category: 'BROKEN_LIGHTING', severity_level: 'LOW', description: 'Light out', location: CAMPUS.destination });
+    assert.equal(report.status, 201, JSON.stringify(report.body));
+    assert.equal((await fresh).incident.group_id, report.body.group_id);
+    await silent(viewerSocket, 'incident:map'); // pending reports are not on the map
+
+    const status = next(reporterSocket, 'incident:status');
+    const map = next(viewerSocket, 'incident:map');
+    await request(app).post(`/api/staff/incidents/${report.body.group_id}/verify`).set({ Authorization: `Bearer ${officer.token}` }).send({});
+    assert.deepEqual(
+      { report: (await status).report_id, state: (await status).status },
+      { report: report.body.report_id, state: 'VERIFIED' },
+    );
+    assert.equal((await map).group_id, report.body.group_id);
+  });
+
   it('disconnects a socket when its session token expires', async () => {
     const shortLived = await signToken({ sub: student.id, email: student.email, expiresInSeconds: 1 });
     const s = await open({ token: shortLived });

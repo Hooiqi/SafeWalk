@@ -45,6 +45,7 @@ class RoutePreview {
     required this.duration,
     required this.isEstimate,
     this.steps = const [],
+    this.hazards = const [],
   });
 
   factory RoutePreview.fromJson(Map<String, dynamic> j) => RoutePreview(
@@ -56,6 +57,7 @@ class RoutePreview {
           for (final s in (j['steps'] as List? ?? const []))
             RouteStep((s as Map)['instruction'] as String, ((s['distance_m'] as num?) ?? 0).toInt()),
         ],
+        hazards: [for (final h in (j['hazards'] as List? ?? const [])) Incident.fromJson(h as Map<String, dynamic>)],
       );
 
   final List<LatLng> points;
@@ -67,6 +69,9 @@ class RoutePreview {
 
   /// True when OSRM was unreachable and the server used a straight-line estimate.
   final bool isEstimate;
+
+  /// Verified incidents within 50 m of the route (Module 3 hazard check).
+  final List<Incident> hazards;
 }
 
 class LocationFix {
@@ -387,4 +392,128 @@ class SosAlert {
       history: latest == null || duplicate ? history : [...history, latest],
     );
   }
+}
+
+// ---- Module 3: incident reports ---------------------------------------------
+
+/// An incident on the shared safety map. Carries no reporter, description or photo.
+class Incident {
+  const Incident({
+    required this.id,
+    required this.category,
+    required this.severity,
+    required this.status,
+    required this.autoVerified,
+    required this.reportCount,
+    required this.location,
+    this.firstReportedAt,
+    this.lastReportedAt,
+    this.reviewedAt,
+    this.resolvedAt,
+    this.publicNote,
+    this.distanceFromRouteM,
+  });
+
+  factory Incident.fromJson(Map<String, dynamic> j) => Incident(
+        id: j['group_id'] as String,
+        category: j['category'] as String,
+        severity: j['severity_level'] as String,
+        status: j['status'] as String,
+        autoVerified: j['auto_verified'] as bool? ?? false,
+        reportCount: (j['report_count'] as num?)?.toInt() ?? 1,
+        location: _point(Map<String, dynamic>.from(j['location'] as Map)),
+        firstReportedAt: _date(j['first_reported_at']),
+        lastReportedAt: _date(j['last_reported_at']),
+        reviewedAt: _date(j['reviewed_at']),
+        resolvedAt: _date(j['resolved_at']),
+        publicNote: j['public_note'] as String?,
+        distanceFromRouteM: (j['distance_from_route_m'] as num?)?.toInt(),
+      );
+
+  final String id;
+  final String category;
+  final String severity;
+  final String status;
+  final bool autoVerified;
+  final int reportCount;
+  final LatLng location;
+  final DateTime? firstReportedAt;
+  final DateTime? lastReportedAt;
+  final DateTime? reviewedAt;
+  final DateTime? resolvedAt;
+  final String? publicNote;
+  final int? distanceFromRouteM;
+}
+
+/// One of the signed-in person's own reports, with the status of its incident.
+class MyReport {
+  const MyReport({
+    required this.id,
+    required this.incidentId,
+    required this.category,
+    required this.severity,
+    required this.description,
+    required this.isAnonymous,
+    required this.hasPhoto,
+    required this.location,
+    required this.submittedAt,
+    required this.status,
+    required this.autoVerified,
+    required this.reportCount,
+    this.reviewedAt,
+    this.resolvedAt,
+    this.publicNote,
+  });
+
+  factory MyReport.fromJson(Map<String, dynamic> j) => MyReport(
+        id: j['report_id'] as String,
+        incidentId: j['group_id'] as String,
+        category: j['category'] as String,
+        severity: j['severity_level'] as String,
+        description: j['description'] as String,
+        isAnonymous: j['is_anonymous'] as bool? ?? false,
+        hasPhoto: j['has_photo'] as bool? ?? false,
+        location: _point(Map<String, dynamic>.from(j['location'] as Map)),
+        submittedAt: _date(j['submitted_at'])!,
+        status: j['status'] as String,
+        autoVerified: j['auto_verified'] as bool? ?? false,
+        reportCount: (j['report_count'] as num?)?.toInt() ?? 1,
+        reviewedAt: _date(j['reviewed_at']),
+        resolvedAt: _date(j['resolved_at']),
+        publicNote: j['public_note'] as String?,
+      );
+
+  final String id;
+  final String incidentId;
+  final String category;
+  final String severity;
+  final String description;
+  final bool isAnonymous;
+  final bool hasPhoto;
+  final LatLng location;
+  final DateTime submittedAt;
+  final String status;
+  final bool autoVerified;
+  final int reportCount;
+  final DateTime? reviewedAt;
+  final DateTime? resolvedAt;
+  final String? publicNote;
+
+  MyReport copyWith({String? status, bool? autoVerified, String? publicNote, bool? hasPhoto}) => MyReport(
+        id: id,
+        incidentId: incidentId,
+        category: category,
+        severity: severity,
+        description: description,
+        isAnonymous: isAnonymous,
+        hasPhoto: hasPhoto ?? this.hasPhoto,
+        location: location,
+        submittedAt: submittedAt,
+        status: status ?? this.status,
+        autoVerified: autoVerified ?? this.autoVerified,
+        reportCount: reportCount,
+        reviewedAt: reviewedAt,
+        resolvedAt: resolvedAt,
+        publicNote: publicNote ?? this.publicNote,
+      );
 }

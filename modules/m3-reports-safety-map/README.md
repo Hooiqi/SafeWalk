@@ -34,17 +34,21 @@ Let students report incidents and unsafe places, and let everyone see verified i
 ## Data
 | Reads | Writes |
 |---|---|
-| `incidents` (VERIFIED, plus the user's own) | `incidents` (status PENDING) |
+| `incident_group` (VERIFIED, plus the user's own reports) | `incident_report` (its incident starts PENDING) |
 
 ## Gives to other modules
 M4 receives PENDING reports in its review queue, verifies or rejects them, and the verified ones appear on this map.
 
-## Progress
-- [ ] Report form and save
-- [ ] Safety map with pins
-- [ ] Detail card
-- [ ] My reports
-- [ ] Filters
+## Progress (10 Nov 2026)
+- [x] Report form and save (category, severity, pin, description, anonymous, optional photo)
+- [x] Safety map with colour-coded pins, loaded for the visible area only
+- [x] Detail sheet
+- [x] My reports with live status
+- [x] Crowdsourced auto-verification (3 people, 50 m, 30 minutes)
+- [x] Hazard warning when planning a walk (Module 1)
+- [x] Review queue in the dashboard: verify, reject, resolve, merge duplicates (Module 4)
+- [x] Tests: `apps/server/test/incidents.test.js`, `socket.test.js`, `apps/mobile/test/incidents_test.dart`
+- [ ] Filters by category and time on the map (extra)
 - [ ] Heatmap and clustering (extra)
-- [ ] Tests with seed data
-- [ ] Integration test with M4
+
+Decisions taken while building it are A20 to A24 in `docs/PLAN.md`.

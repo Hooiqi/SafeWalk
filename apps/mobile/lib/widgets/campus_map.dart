@@ -18,6 +18,9 @@ class CampusMap extends StatelessWidget {
     this.initialCenter,
     this.initialZoom = 16,
     this.markers = const [],
+    this.onPositionChanged,
+    this.extraLayers = const [],
+    this.markersOnTop = false,
   });
 
   final MapController? controller;
@@ -31,6 +34,15 @@ class CampusMap extends StatelessWidget {
   /// Additional markers (e.g. safe points), drawn under the user's position.
   final List<Marker> markers;
 
+  /// Called when the visible area changes (e.g. to load incidents in view).
+  final void Function(MapCamera camera, bool hasGesture)? onPositionChanged;
+
+  /// Layers drawn between the route and the markers.
+  final List<Widget> extraLayers;
+
+  /// Draw [markers] above the user's position (e.g. incident pins that can be tapped).
+  final bool markersOnTop;
+
   @override
   Widget build(BuildContext context) {
     return FlutterMap(
@@ -42,6 +54,7 @@ class CampusMap extends StatelessWidget {
         maxZoom: 19,
         backgroundColor: SwColors.background,
         onTap: onTap == null ? null : (_, point) => onTap!(point),
+        onPositionChanged: onPositionChanged,
         interactionOptions: const InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
       ),
       children: [
@@ -54,8 +67,9 @@ class CampusMap extends StatelessWidget {
           PolylineLayer(polylines: [
             Polyline(points: route, color: SwColors.primary, strokeWidth: 5),
           ]),
+        ...extraLayers,
         MarkerLayer(markers: [
-          ...markers,
+          if (!markersOnTop) ...markers,
           if (destination != null)
             Marker(
               point: destination!,
@@ -70,6 +84,7 @@ class CampusMap extends StatelessWidget {
               height: 26,
               child: const _MyPositionDot(),
             ),
+          if (markersOnTop) ...markers,
         ]),
         const RichAttributionWidget(
           alignment: AttributionAlignment.bottomLeft,

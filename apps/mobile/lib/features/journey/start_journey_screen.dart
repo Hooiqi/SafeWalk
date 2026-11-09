@@ -13,6 +13,7 @@ import '../../services/location_service.dart';
 import '../../services/trip_tracker.dart';
 import '../../widgets/campus_map.dart';
 import '../../widgets/common.dart';
+import '../incidents/incident_ui.dart';
 import '../contacts/contacts_controller.dart';
 
 /// Module 1, Feature 1: pick a destination on the campus map, preview the
@@ -283,6 +284,10 @@ class _JourneySheet extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 4),
                 child: Text('Routing service unavailable: straight-line estimate.', style: text.bodySmall),
               ),
+            if (preview!.hazards.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              _RouteHazards(hazards: preview!.hazards),
+            ],
           ],
           const SizedBox(height: 14),
           TextField(
@@ -317,6 +322,53 @@ class _JourneySheet extends StatelessWidget {
           FilledButton(onPressed: onStart, child: Text(starting ? 'Starting…' : 'Start journey')),
         ]),
       ),
+    );
+  }
+}
+
+/// Hazard check before walking (Module 3): verified incidents near the route.
+class _RouteHazards extends StatelessWidget {
+  const _RouteHazards({required this.hazards});
+  final List<Incident> hazards;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: SwColors.secondary.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(SwRadius.inner),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.warning_amber_rounded, size: 18, color: SwColors.secondary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              hazards.length == 1 ? '1 verified incident on this route' : '${hazards.length} verified incidents on this route',
+              style: text.titleSmall?.copyWith(color: SwColors.secondary),
+            ),
+          ),
+        ]),
+        const SizedBox(height: 6),
+        for (final h in hazards.take(3))
+          InkWell(
+            onTap: () => showIncidentDetails(context, h),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(children: [
+                Icon(categoryIcon(h.category), size: 18, color: SwColors.text2),
+                const SizedBox(width: 8),
+                Expanded(child: Text(categoryLabel(h.category))),
+                SeverityLabel(h.severity, suffix: ''),
+              ]),
+            ),
+          ),
+        if (hazards.length > 3) Text('and ${hazards.length - 3} more', style: text.bodySmall),
+        const SizedBox(height: 4),
+        Text('Consider another way, or walk with someone.', style: text.bodySmall),
+      ]),
     );
   }
 }

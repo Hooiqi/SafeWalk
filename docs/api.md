@@ -20,7 +20,7 @@ Errors: `{ "error": { "code": "TRIP_ALREADY_OPEN", "message": "…", "details": 
 | GET | `/api/contacts` | | Trusted contacts |
 | POST | `/api/contacts` | `contact_name`, at least one of `phone_number`, `email`, `telegram_chat_id` | Add (max 10) |
 | PATCH / DELETE | `/api/contacts/:id` | | Edit / remove own contact |
-| POST | `/api/trips/route-preview` | `origin`, `destination` (`{lat,lng}`) | OSRM walking route: `distance_m`, `duration_s`, `geometry`, `source` |
+| POST | `/api/trips/route-preview` | `origin`, `destination` (`{lat,lng}`) | OSRM walking route: `distance_m`, `duration_s`, `geometry`, `source`, and `hazards[]` (verified incidents within 50 m, with `distance_from_route_m`) |
 | POST | `/api/trips` | `origin`, `destination`, `contact_ids[]`, `destination_label?`, `battery_level?`, `accuracy_m?` | Start journey. Returns trip, `tracking_url`, `link_delivery[]`. `409 TRIP_ALREADY_OPEN` |
 | GET | `/api/trips/active` | | `{ trip }` or `{ trip: null }` |
 | GET | `/api/trips?limit=&before=` | | History, newest first |
@@ -46,6 +46,16 @@ Illegal transitions return `409 INVALID_TRIP_STATE`.
 | GET | `/api/safe-points/nearest?lat=&lng=&limit=` | | Open now (Malaysia time), k-NN, ranked by walking time (`walking.source` = `OSRM` or `STRAIGHT_LINE_ESTIMATE`) |
 | GET | `/api/safe-points/:id/directions?lat=&lng=` | | Walking route with `steps[]` (instruction, distance) |
 
+### Module 3: incident reports and the safety map
+
+| Method | Path | Body / query | Description |
+|---|---|---|---|
+| POST | `/api/incidents` | `category`, `severity_level` (`LOW`/`MEDIUM`/`HIGH`), `description` (1-1000), `location`, `accuracy_m?`, `is_anonymous`, `client_request_id?` | Send a report. Returns the report with its incident's `status`. `409 ALREADY_REPORTED` (same person, same incident, 30 min), `429 RATE_LIMITED` (per hour) |
+| POST | `/api/incidents/reports/:id/photo` | raw JPEG or PNG body (`Content-Type: image/jpeg` or `image/png`, max 5 MB) | Optional photo, once, within 30 minutes. Metadata (EXIF, GPS) removed. `503 PHOTO_STORAGE_NOT_CONFIGURED` without storage |
+| GET | `/api/incidents/mine` | | Own reports with status (`PENDING`, `VERIFIED`, `REJECTED`, `RESOLVED`), `auto_verified`, `public_note` |
+| GET | `/api/incidents/map?south=&west=&north=&east=` | | Verified incidents in the visible area only (max 0.5° each way), highest severity first, `truncated` above 200 |
+| GET | `/api/incidents/:groupId` | | One verified or resolved incident, or one the person reported. No reporters, descriptions or photos |
+
 ## Security staff (`requireSecurityStaff`)
 
 | Method | Path | Description |
@@ -57,6 +67,13 @@ Illegal transitions return `409 INVALID_TRIP_STATE`.
 | GET | `/api/staff/safe-points` | All safe points incl. inactive and unpinned, with `opening_schedule` |
 | POST | `/api/staff/safe-points` | Create (name, category, location or null, operating_hours, opening_schedule, contact_phone, …) |
 | PATCH | `/api/staff/safe-points/:id` | Update any field; records the officer in `updated_by` |
+| GET | `/api/staff/incidents?status=OPEN\|PENDING\|VERIFIED\|RESOLVED\|REJECTED\|ALL` | Review queue: pending first, then by severity; `reporters`, `photo_count`, `latest_description` |
+| GET | `/api/staff/incidents/:groupId` | Incident with every report (description, reporter unless anonymous, photo flag, position) and open incidents within 200 m (`nearby`) |
+| GET | `/api/staff/incidents/reports/:id/photo` | The report's photo (private, not cached) |
+| POST | `/api/staff/incidents/:groupId/verify` | `{ severity_level?, public_note?, staff_note? }`. Pending or verified to VERIFIED (shown on the map); also used to edit a verified incident |
+| POST | `/api/staff/incidents/:groupId/reject` | Remove a false report (pending or verified to REJECTED) |
+| POST | `/api/staff/incidents/:groupId/resolve` | Verified to RESOLVED (leaves the map). Invalid steps `409 INVALID_TRANSITION` |
+| POST | `/api/staff/incidents/:groupId/merge` | `{ into_group_id }`: moves every report into the other incident and deletes this one |
 
 ## Socket.io
 
@@ -76,4 +93,7 @@ Every server event includes `event_id` (for de-duplication) and `emitted_at`.
 | `alert:new` | server to client | staff | `{ alert }` (same shape as `GET /api/staff/alerts/:id`) |
 | `alert:position` | server to client | staff, SOS link viewers | live position of an SOS (`alert_id`) or an escalated trip (`trip_id`) |
 | `alert:status` | server to client | staff, the person, SOS / journey link viewers | `{ alert_id, trigger_type, trip_id, status, resolved_at, user_safe_at, latest: { new_status, updated_at, staff_name, note } }` |
+| `incident:new` / `incident:updated` | server to client | staff | `{ incident }` (a merged incident arrives as `{ group_id, merged_into, status: 'MERGED' }`) |
+| `incident:status` | server to client | each reporter of the incident | `{ report_id, group_id, status, auto_verified, public_note }` |
+| `incident:map` | server to client | every signed-in app user | `{ group_id, status, location }`: verified pins changed, reload the visible area |
 | `auth:expired` | server to client | any | the token expired; reconnect with a fresh one |

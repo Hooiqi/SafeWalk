@@ -114,7 +114,27 @@ location"), click its position on the map and press **Save**. Hours, phone
 numbers and notes can be corrected on the same form. The student app shows
 only points that are active and pinned.
 
-## 7. Demonstrating Module 2
+## 7. Demonstrating Module 3
+
+Photos: in development the server keeps them in `PHOTO_STORAGE_DIR`
+(`./.data/incident-photos` in `.env.example`). With a Supabase project, set
+`SUPABASE_SERVICE_ROLE_KEY` instead; the migration creates the private
+`incident-photos` bucket.
+
+1. In the app, open **Report an incident** on Home. Choose what happened and how
+   serious it is, describe it, check the pin (your GPS position; tap the map to
+   move it), optionally report anonymously and add a photo, then **Send report**.
+2. The dashboard's **Safety reports** page shows it at once. Open it, adjust the
+   severity, add a note for everyone and press **Verify and show on map**.
+   **Mark resolved** takes it off the map; **Reject as false** removes it.
+   Nearby duplicates can be merged with **Merge here**.
+3. In the app, **My reports** updates live; **Safety map** shows the incident,
+   coloured by severity. Tap a pin for details.
+4. Auto-verification: three different accounts reporting the same category
+   within 50 m and 30 minutes put the incident on the map without review.
+5. Plan a walk that passes a verified incident: the start screen warns about it.
+
+## 8. Demonstrating Module 2
 
 1. In the app, open **SOS** and hold the button for 3 seconds (or turn on
    **Silent SOS** first). A quick tap does nothing.
@@ -131,7 +151,7 @@ only points that are active and pinned.
 The emergency call buttons use `+604-653 4999` (USM Security) and `999`.
 Change them with `--dart-define=USM_SECURITY_EMERGENCY=+60...` if needed.
 
-## 8. Demonstrating Module 1
+## 9. Demonstrating Module 1
 
 For a demo without a long walk, set `DEV_ETA_OVERRIDE_SECONDS=60` in
 `apps/server/.env` (ignored in production) and restart the server.

@@ -113,13 +113,14 @@ export function recordingChannels() {
   };
 }
 
-export async function buildTestContainer(databaseUrl, { clock = testClock(), fetch = fakeOsrmFetch(), configExtra } = {}) {
+export async function buildTestContainer(databaseUrl, { clock = testClock(), fetch = fakeOsrmFetch(), configExtra, photoStorage } = {}) {
   const config = testConfig(databaseUrl, configExtra);
   const recorder = recordingChannels();
   const container = await createContainer(config, {
     clock,
     fetch,
     channels: recorder.channels,
+    photoStorage,
     logger: (await import('pino')).default({ level: 'silent' }),
   });
   return { ...container, clock, deliveries: recorder.deliveries };

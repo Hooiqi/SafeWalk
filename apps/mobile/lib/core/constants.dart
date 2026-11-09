@@ -20,8 +20,45 @@ class SocketEvents {
   static const tripGracePrompt = 'trip:grace_prompt';
   static const tripSignal = 'trip:signal';
   static const alertStatus = 'alert:status';
+  static const incidentStatus = 'incident:status';
+  static const incidentMap = 'incident:map';
   static const authExpired = 'auth:expired';
 }
+
+/// Module 3 incident reports (see docs/PLAN.md A20, A21).
+class IncidentCategory {
+  const IncidentCategory._();
+  static const all = [
+    'SUSPICIOUS_ACTIVITY',
+    'HARASSMENT',
+    'THEFT',
+    'BROKEN_LIGHTING',
+    'STRAY_ANIMAL',
+    'UNSAFE_PATH',
+    'OTHER',
+  ];
+}
+
+class IncidentSeverity {
+  const IncidentSeverity._();
+  static const low = 'LOW';
+  static const medium = 'MEDIUM';
+  static const high = 'HIGH';
+  static const all = [low, medium, high];
+}
+
+class IncidentStatus {
+  const IncidentStatus._();
+  static const pending = 'PENDING';
+  static const verified = 'VERIFIED';
+  static const rejected = 'REJECTED';
+  static const resolved = 'RESOLVED';
+}
+
+/// Proposal Module 3: 3 or more people, within 50 m, over 30 minutes.
+const autoVerifyReporters = 3;
+const autoVerifyRadiusM = 50;
+const autoVerifyWindowMinutes = 30;
 
 /// Interval of the device heartbeat sent during a journey. The server marks
 /// the signal as lost after HEARTBEAT_STALE_SECONDS (default 60 s).

@@ -8,6 +8,7 @@ export const rooms = {
   tripViewers: (tripId) => `trip:${tripId}`,
   alertViewers: (alertId) => `alert:${alertId}`,
   staff: 'staff',
+  appUsers: 'app-users', // every signed-in student/staff app user (shared safety map)
 };
 
 /**
@@ -91,6 +92,35 @@ export function createPublisher() {
       if (alert.user_id) emit(rooms.user(alert.user_id), E.ALERT_STATUS, data);
       emit(rooms.alertViewers(alert.alert_id), E.ALERT_STATUS, data);
       if (alert.trip_id) emit(rooms.tripViewers(alert.trip_id), E.ALERT_STATUS, data);
+    },
+
+    // ---- Module 3: incident reports -------------------------------------
+
+    /** Security dashboard: a report started a new incident, or an incident changed. */
+    incidentForStaff(group, { isNew = false } = {}) {
+      emit(rooms.staff, isNew ? E.INCIDENT_NEW : E.INCIDENT_UPDATED, { incident: group });
+    },
+
+    /** Tell each reporter their report's status. Never names other reporters. */
+    incidentStatus(group, ownerReports) {
+      for (const { user_id, report_id } of ownerReports) {
+        emit(rooms.user(user_id), E.INCIDENT_STATUS, {
+          report_id,
+          group_id: group.group_id,
+          status: group.status,
+          auto_verified: group.auto_verified,
+          public_note: group.public_note ?? null,
+        });
+      }
+    },
+
+    /** Verified pins changed: app users reload the area they are looking at. */
+    incidentMap(group) {
+      emit(rooms.appUsers, E.INCIDENT_MAP, {
+        group_id: group.group_id,
+        status: group.status,
+        location: group.location,
+      });
     },
 
     /** Live position during an SOS: security and the SOS link viewers. */

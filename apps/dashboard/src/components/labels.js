@@ -49,3 +49,29 @@ export function alertStateNote(alert) {
   if (alert.trigger_type === 'SILENT') return { tone: 'open', text: 'Silent SOS: may not be able to talk' };
   return { tone: 'open', text: 'SOS raised by the person' };
 }
+
+// ---- Module 3: incident reports -------------------------------------------
+
+export const INCIDENT_CATEGORY_LABEL = {
+  SUSPICIOUS_ACTIVITY: 'Suspicious activity',
+  HARASSMENT: 'Harassment',
+  THEFT: 'Theft',
+  BROKEN_LIGHTING: 'Broken lighting',
+  STRAY_ANIMAL: 'Stray animal',
+  UNSAFE_PATH: 'Unsafe path',
+  OTHER: 'Other',
+};
+
+export const SEVERITY_LABEL = { LOW: 'Low', MEDIUM: 'Medium', HIGH: 'High' };
+
+export const INCIDENT_STATUS_LABEL = {
+  PENDING: 'Pending review',
+  VERIFIED: 'Verified, on the map',
+  REJECTED: 'Rejected',
+  RESOLVED: 'Resolved',
+};
+
+export const INCIDENT_STATUS_SHORT = { PENDING: 'Pending', VERIFIED: 'On the map', REJECTED: 'Rejected', RESOLVED: 'Resolved' };
+
+/** Pending needs security (apricot); verified is handled (periwinkle); closed ones are quiet. */
+export const incidentTone = (status) => (status === 'PENDING' ? 'open' : status === 'VERIFIED' ? 'done' : '');

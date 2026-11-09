@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>SafeWalk uses the camera only when you choose to add a photo to an incident report.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SafeWalk opens your photos only when you choose one to add to an incident report.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>SafeWalk uses your location during a journey you start so your trusted contacts and USM Security can see where you are.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

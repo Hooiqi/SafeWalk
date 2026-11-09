@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide RealtimeChannel;
 
 import 'core/api_client.dart';
 import 'core/config.dart';
@@ -86,6 +86,8 @@ class _SafeWalkAppState extends State<SafeWalkApp> {
         Provider.value(value: _profiles),
         Provider.value(value: _location),
         Provider.value(value: SafePointsRepository(_api)),
+        Provider.value(value: IncidentsRepository(_api)),
+        Provider<RealtimeChannel>.value(value: _realtime),
         Provider.value(value: const PhoneDialer()),
         ChangeNotifierProvider(create: (_) => ContactsController(ContactsRepository(_api))),
         ChangeNotifierProvider.value(value: _tracker),

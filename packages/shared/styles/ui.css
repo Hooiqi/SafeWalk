@@ -95,3 +95,18 @@ body { font-variant-numeric: tabular-nums; }
 .mark-point { stroke: var(--color-paper); fill: var(--color-accent); fill-opacity: 0.9; }
 .mark-point--off { fill: var(--color-muted); fill-opacity: 0.5; }
 .mark-selected { stroke: var(--color-ink); fill: var(--color-accent-2); fill-opacity: 1; }
+
+/* ---- Module 3: incident severity ----------------------------------------
+   The proposal asks for colour-coded incident pins, so severity takes a
+   third colour: low in bone, medium in apricot, high in the coral error
+   colour. Every use pairs it with the severity icon and word. */
+.sev { display: inline-flex; align-items: center; gap: var(--space-3xs); font-size: var(--text-sm); font-weight: 500; white-space: nowrap; }
+.sev svg { width: 16px; height: 16px; }
+.sev--LOW { color: var(--color-ink-2); }
+.sev--MEDIUM { color: var(--color-accent-2); }
+.sev--HIGH { color: var(--color-error); }
+.mark-incident { stroke: var(--color-paper); stroke-width: 2; fill-opacity: 1; }
+.mark-incident--LOW { fill: var(--color-ink-2); }
+.mark-incident--MEDIUM { fill: var(--color-accent-2); }
+.mark-incident--HIGH { fill: var(--color-error); }
+.mark-report { stroke: var(--color-ink); stroke-width: 1.5; fill: var(--color-paper); fill-opacity: 1; }

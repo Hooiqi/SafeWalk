@@ -53,7 +53,7 @@ export function attachSocketServer(httpServer, deps) {
 
   io.on('connection', (socket) => {
     const { identity, viewerRoom, expiresAt } = socket.data;
-    if (identity?.isAppUser) socket.join(rooms.user(identity.userId));
+    if (identity?.isAppUser) socket.join([rooms.user(identity.userId), rooms.appUsers]);
     if (identity?.isStaff) socket.join(rooms.staff);
     if (viewerRoom) socket.join(viewerRoom);
 

@@ -50,6 +50,30 @@ export const SAFE_POINT_CATEGORY = Object.freeze({
   POLICE_STATION: 'POLICE_STATION',
 });
 
+// ---- Module 3: incident reports (see docs/PLAN.md A20, A21) --------------
+
+export const INCIDENT_CATEGORY = Object.freeze({
+  SUSPICIOUS_ACTIVITY: 'SUSPICIOUS_ACTIVITY',
+  HARASSMENT: 'HARASSMENT',
+  THEFT: 'THEFT',
+  BROKEN_LIGHTING: 'BROKEN_LIGHTING',
+  STRAY_ANIMAL: 'STRAY_ANIMAL',
+  UNSAFE_PATH: 'UNSAFE_PATH',
+  OTHER: 'OTHER',
+});
+
+export const INCIDENT_SEVERITY = Object.freeze({ LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH' });
+
+export const INCIDENT_STATUS = Object.freeze({
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED',
+  RESOLVED: 'RESOLVED',
+});
+
+/** Proposal Module 3: 3 or more users, within 50 m, over a 30-minute window. */
+export const AUTO_VERIFY = Object.freeze({ MIN_REPORTERS: 3, RADIUS_M: 50, WINDOW_MINUTES: 30 });
+
 /** Socket.io event names. Server events carry { event_id, emitted_at, ...data }. */
 export const SOCKET_EVENTS = Object.freeze({
   // client -> server
@@ -64,6 +88,10 @@ export const SOCKET_EVENTS = Object.freeze({
   ALERT_NEW: 'alert:new',
   ALERT_POSITION: 'alert:position',
   ALERT_STATUS: 'alert:status',
+  INCIDENT_NEW: 'incident:new', // staff: a report started a new incident
+  INCIDENT_UPDATED: 'incident:updated', // staff: an incident changed (new report, review, merge)
+  INCIDENT_STATUS: 'incident:status', // reporter: the status of one of their reports changed
+  INCIDENT_MAP: 'incident:map', // every app user: verified pins changed, reload the visible area
   AUTH_EXPIRED: 'auth:expired',
 });
 

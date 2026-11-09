@@ -59,6 +59,17 @@ const schema = z.object({
   SMTP_URL: optionalString,
   SMTP_FROM: z.string().default('SafeWalk <no-reply@safewalk.test>'),
   NOTIFICATION_TIMEOUT_MS: intWithDefault(8000),
+
+  // Module 3: incident reports
+  // Supabase Storage for report photos (server only; never shipped to clients).
+  SUPABASE_SERVICE_ROLE_KEY: optionalString,
+  // Development only: keep photos in this folder when Supabase Storage is not configured.
+  PHOTO_STORAGE_DIR: optionalString,
+  MAX_PHOTO_BYTES: intWithDefault(5 * 1024 * 1024),
+  PHOTO_UPLOAD_WINDOW_MINUTES: intWithDefault(30),
+  INCIDENT_REPORTS_PER_HOUR: intWithDefault(10),
+  // Burst limit on the report and photo endpoints (requests per minute per user).
+  INCIDENT_REQUESTS_PER_MINUTE: intWithDefault(10),
 });
 
 const splitList = (value) =>

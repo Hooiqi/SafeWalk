@@ -3,8 +3,8 @@ import 'package:intl/intl.dart';
 final _time = DateFormat('h:mm a');
 final _dateTime = DateFormat('d MMM, h:mm a');
 
-String formatTime(DateTime? t) => t == null ? '—' : _time.format(t.toLocal());
-String formatDateTime(DateTime? t) => t == null ? '—' : _dateTime.format(t.toLocal());
+String formatTime(DateTime? t) => t == null ? 'Not recorded' : _time.format(t.toLocal());
+String formatDateTime(DateTime? t) => t == null ? 'Not recorded' : _dateTime.format(t.toLocal());
 
 /// "45 s", "8 min", "1 h 05 min"
 String formatDuration(Duration d) {
@@ -22,6 +22,6 @@ String formatCountdown(Duration d) {
 }
 
 String formatDistance(num? metres) {
-  if (metres == null) return '—';
+  if (metres == null) return 'Unknown';
   return metres < 1000 ? '${metres.round()} m' : '${(metres / 1000).toStringAsFixed(1)} km';
 }

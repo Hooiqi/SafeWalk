@@ -7,6 +7,9 @@ import 'features/auth/welcome_screen.dart';
 import 'features/contacts/contact_form_screen.dart';
 import 'features/contacts/contacts_screen.dart';
 import 'features/history/history_screen.dart';
+import 'features/incidents/my_reports_screen.dart';
+import 'features/incidents/report_incident_screen.dart';
+import 'features/incidents/safety_map_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/journey/active_journey_screen.dart';
 import 'features/journey/start_journey_screen.dart';
@@ -36,6 +39,9 @@ GoRouter buildRouter(AuthService auth) => GoRouter(
         GoRoute(path: '/contacts/new', builder: (_, _) => const ContactFormScreen()),
         GoRoute(path: '/contacts/edit', builder: (_, state) => ContactFormScreen(contact: state.extra as TrustedContact?)),
         GoRoute(path: '/history', builder: (_, _) => const HistoryScreen()),
+        GoRoute(path: '/incidents', builder: (_, _) => const SafetyMapScreen()),
+        GoRoute(path: '/incidents/report', builder: (_, _) => const ReportIncidentScreen()),
+        GoRoute(path: '/incidents/mine', builder: (_, _) => const MyReportsScreen()),
         StatefulShellRoute.indexedStack(
           builder: (_, _, shell) => AppShell(shell: shell),
           branches: [

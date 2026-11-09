@@ -1,21 +1,30 @@
+import { useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import TopBar from './components/TopBar.jsx';
 import EmergenciesPage from './pages/EmergenciesPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
+import ReportsPage from './pages/ReportsPage.jsx';
 import SafePointsPage from './pages/SafePointsPage.jsx';
 import { useAuth } from './lib/useAuth.js';
 import { useEmergencies } from './lib/useEmergencies.js';
+import { useIncidents } from './lib/useIncidents.js';
 import { supabaseConfigured } from './lib/supabase.js';
 
 function StaffShell({ auth }) {
   const emergencies = useEmergencies(auth.session.access_token);
   const open = emergencies.alerts.filter((a) => a.status !== 'RESOLVED').length;
+  const [reportFilter, setReportFilter] = useState('OPEN');
+  const reports = useIncidents(auth.session.access_token, reportFilter);
   return (
     <div className="shell">
-      <TopBar staff={auth.staff} onSignOut={auth.signOut} openCount={open} />
+      <TopBar staff={auth.staff} onSignOut={auth.signOut} openCount={open} pendingReports={reports.pendingCount} />
       <main className="shell__main">
         <Routes>
           <Route path="/emergencies" element={<EmergenciesPage accessToken={auth.session.access_token} emergencies={emergencies} />} />
+          <Route
+            path="/reports"
+            element={<ReportsPage accessToken={auth.session.access_token} reports={reports} filter={reportFilter} onFilter={setReportFilter} />}
+          />
           <Route path="/safe-points" element={<SafePointsPage accessToken={auth.session.access_token} />} />
           <Route path="*" element={<Navigate to="/emergencies" replace />} />
         </Routes>

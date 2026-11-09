@@ -5,10 +5,11 @@ Project, Group 12). Students and staff share a live walk with trusted
 contacts; a server-side watchdog alerts those contacts and the USM Security
 Department if they do not arrive and do not respond.
 
-> **Status (7 Nov 2026):** **Module 1 (Live Trip Sharing and ETA Monitoring)**
-> and **Module 2 (Emergency SOS and Safe Point Navigator)** are implemented and
-> tested, together with the security response workflow and safe point
-> management from Module 4. Module 3 and the rest of Module 4 follow the
+> **Status (10 Nov 2026):** **Module 1 (Live Trip Sharing and ETA Monitoring)**,
+> **Module 2 (Emergency SOS and Safe Point Navigator)** and **Module 3
+> (Incident Reporting and Safety Map)** are implemented and tested, together
+> with the security response workflow, safe point management and report review
+> from Module 4. The rest of Module 4 (announcements, analytics) follows the
 > proposal's sprint plan. See [docs/PLAN.md](docs/PLAN.md) for the full
 > requirements traceability matrix.
 >
@@ -21,8 +22,8 @@ Department if they do not arrive and do not respond.
 |---|---|
 | M1 Live trip sharing and ETA monitoring | Implemented |
 | M2 Emergency SOS and safe point navigator | Implemented |
-| M3 Incident reporting and safety map | Planned |
-| M4 Admin centralised security dashboard | Staff login, live alerts with response workflow, safe point management implemented; reports, announcements, analytics planned |
+| M3 Incident reporting and safety map | Implemented |
+| M4 Admin centralised security dashboard | Staff login, live alerts with response workflow, safe point management and report review implemented; announcements and analytics planned |
 
 ## Architecture (proposal 5.2.1, four tiers)
 
@@ -75,7 +76,7 @@ npm run dev:server
 | Document | Contents |
 |---|---|
 | [docs/PLAN.md](docs/PLAN.md) | Stages, traceability matrix, ambiguities, external dependencies, checklist |
-| [docs/setup.md](docs/setup.md) | Install, environment variables, running, tests, Module 1 demo |
+| [docs/setup.md](docs/setup.md) | Install, environment variables, running, tests, module demos |
 | [docs/database.md](docs/database.md) | ERD mapping, additions, constraints, RLS |
 | [docs/api.md](docs/api.md) | REST endpoints and Socket.io events |
 | [docs/design.md](docs/design.md) | Dusk theme, tokens and UI conventions |
@@ -89,7 +90,6 @@ npm run dev:server
 - Background location has not yet been tested on a physical Android or iOS device.
 - The default OSRM server is a fair-use public service; production use needs a
   self-hosted OSRM with the foot profile.
-- Checking known hazards before a walk depends on the Module 3 safety map.
 
 ## Known limitations (Module 2)
 
@@ -100,6 +100,18 @@ npm run dev:server
   automatically by the "open now" filter.
 - On Android a location notification is always visible while sharing (also during
   a silent SOS); its wording is neutral ("Location sharing is on").
+
+## Known limitations (Module 3)
+
+- Report photos need Supabase Storage (`SUPABASE_SERVICE_ROLE_KEY`); in
+  development they can be kept in a local folder (`PHOTO_STORAGE_DIR`). Without
+  either, reports still work and the app says the photo was not sent.
+- Photo orientation information is removed together with the other metadata;
+  the app re-encodes photos on the phone, which normally keeps them upright.
+- The safety map shows verified incidents until security resolves them; nothing
+  expires automatically.
+- Duplicate reports more than 30 minutes apart start separate incidents;
+  security merges them on the dashboard.
 
 ## Rules in one line
 

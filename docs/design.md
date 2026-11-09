@@ -25,6 +25,11 @@ The web tokens are written in OKLCH in `packages/shared/styles/tokens.css`
 (apps) and `apps/landing/src/tokens.css` (landing page). The hex values above
 are their sRGB equivalents used in `apps/mobile/lib/core/theme.dart`.
 
+Severity on the safety map (Module 3) adds one more colour, because the
+proposal asks for colour-coded pins: **low** in bone (`--color-ink-2`),
+**medium** in apricot, **high** in coral (`--color-error`). Each pin also shows
+the category icon, and every severity label pairs its chevron icon with the word.
+
 There are exactly two signals. Periwinkle means finished or fine, apricot means
 open or waiting. Neither is red (the error colour is kept for form errors), so an emergency is apricot **plus an icon and
 words** ("SOS sent", "Alert raised"); status is never shown by colour alone.

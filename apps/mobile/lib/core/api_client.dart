@@ -35,13 +35,19 @@ class ApiClient {
   Future<dynamic> patch(String path, Object body) => _send('PATCH', path, body);
   Future<dynamic> delete(String path) => _send('DELETE', path);
 
-  Future<dynamic> _send(String method, String path, [Object? body]) async {
+  /// Raw upload (e.g. a photo) with its content type.
+  Future<dynamic> postBytes(String path, List<int> bytes, String contentType) => _send('POST', path, null, (bytes, contentType));
+
+  Future<dynamic> _send(String method, String path, [Object? body, (List<int>, String)? raw]) async {
     final request = http.Request(method, Uri.parse('$baseUrl$path'));
     final token = _token();
     if (token != null) request.headers['Authorization'] = 'Bearer $token';
     if (body != null) {
       request.headers['Content-Type'] = 'application/json';
       request.body = jsonEncode(body);
+    } else if (raw != null) {
+      request.headers['Content-Type'] = raw.$2;
+      request.bodyBytes = raw.$1;
     }
 
     http.Response response;

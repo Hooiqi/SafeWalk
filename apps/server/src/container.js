@@ -11,6 +11,8 @@ import { createTrackingService } from './modules/tracking/trackingService.js';
 import { createSafePointService } from './modules/safePoints/safePointService.js';
 import { createSosService } from './modules/sos/sosService.js';
 import { createAlertStatusService } from './modules/alerts/alertStatusService.js';
+import { createIncidentService } from './modules/incidents/incidentService.js';
+import { createPhotoStorage } from './modules/incidents/photoStorage.js';
 import { createTripService } from './modules/trips/tripService.js';
 import { createEtaWatchdog } from './modules/watchdog/etaWatchdog.js';
 import { createPublisher } from './realtime/publisher.js';
@@ -42,10 +44,13 @@ export async function createContainer(config, overrides = {}) {
   const safePointService = createSafePointService(base);
   const sosService = createSosService(base);
   const alertStatusService = createAlertStatusService({ ...base, tripService });
+  const photoStorage = overrides.photoStorage ?? createPhotoStorage(config, { fetchImpl: overrides.fetch ?? fetch });
+  const incidentService = createIncidentService({ ...base, photoStorage });
+  if (!photoStorage.configured) logger.info('incident photo storage not configured: photo uploads will be refused');
 
   for (const c of channels) {
     if (!c.configured) logger.info(`notification channel "${c.name}" not configured: deliveries will be reported as skipped`);
   }
 
-  return { ...base, tripService, trackingService, watchdog, safePointService, sosService, alertStatusService };
+  return { ...base, tripService, trackingService, watchdog, safePointService, sosService, alertStatusService, incidentService, photoStorage };
 }

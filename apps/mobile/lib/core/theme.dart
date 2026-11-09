@@ -29,6 +29,12 @@ class SwColors {
   static const secondary = Color(0xFFF4BA87); // --color-accent-2 (apricot): open, waiting
   static const alert = secondary; // SOS and emergencies use the open signal, always with words and an icon
   static const error = Color(0xFFF47C70); // --color-error: form and request errors
+
+  // Module 3 severity on the safety map: the proposal asks for colour-coded
+  // pins, so severity takes a third colour. Always shown with its icon and word.
+  static const severityLow = text2;
+  static const severityMedium = secondary;
+  static const severityHigh = error;
   static const focus = Color(0xFFA9B9FF); // --color-focus
 }
 

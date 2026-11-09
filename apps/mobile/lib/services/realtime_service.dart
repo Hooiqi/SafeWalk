@@ -57,7 +57,14 @@ class RealtimeService implements RealtimeChannel {
       ..onConnectError((_) => _connected.value = false)
       ..on(SocketEvents.authExpired, (_) => socket.disconnect().connect());
 
-    for (final name in [SocketEvents.tripStatus, SocketEvents.tripGracePrompt, SocketEvents.tripSignal, SocketEvents.alertStatus]) {
+    for (final name in [
+      SocketEvents.tripStatus,
+      SocketEvents.tripGracePrompt,
+      SocketEvents.tripSignal,
+      SocketEvents.alertStatus,
+      SocketEvents.incidentStatus,
+      SocketEvents.incidentMap,
+    ]) {
       socket.on(name, (data) {
         if (data is! Map) return;
         final map = Map<String, dynamic>.from(data);

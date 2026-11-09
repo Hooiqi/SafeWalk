@@ -52,6 +52,7 @@ export function errorHandler(logger) {
       );
     }
     if (err?.type === 'entity.parse.failed') err = badRequest('Malformed JSON body');
+    if (err?.type === 'entity.too.large') err = new HttpError(413, 'TOO_LARGE', 'The upload is too large');
     if (err instanceof HttpError) {
       return res.status(err.status).json({ error: { code: err.code, message: err.message, details: err.details } });
     }

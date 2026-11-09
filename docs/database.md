@@ -15,8 +15,8 @@ All location columns are `geography(…, 4326)` (WGS 84 latitude/longitude, dist
 | SOS_ALERT | `sos_alert` | `20261106000100` | Shared by Module 1 (trigger `ETA`) and Module 2 (`HOLD`, `SILENT`) |
 | ALERT_STATUS_LOG | `alert_status_log` | `20261106000100` | `staff_id` is null for system entries |
 | SAFE_POINT | `safe_point` | `20261107000100` | 21 team-supplied points loaded by `20261107000200` without coordinates (pinned by staff) |
-| INCIDENT_GROUP | `incident_group` | Module 3 migration | Not created yet |
-| INCIDENT_REPORT | `incident_report` | Module 3 migration | Not created yet |
+| INCIDENT_GROUP | `incident_group` | `20261110000100` | One incident on the map, made of one or more reports |
+| INCIDENT_REPORT | `incident_report` | `20261110000100` | `user_id` is null for anonymous reports (see `incident_report_owner`) |
 | ANNOUNCEMENT | `announcement` | Module 4 migration | Not created yet |
 
 Each module adds its own tables when it is built, so the schema is reviewed
@@ -42,6 +42,14 @@ with the code that uses it.
 | `sos_alert.accuracy_m`, `share_token`, `share_expires_at` | GPS accuracy; live link for trusted contacts and its expiry |
 | `sos_alert.user_safe_at` | The person reported they are safe (sharing stops; security still resolves) |
 | `alert_status_log.note` | What the officer arranged ("Patrol 2 dispatched") |
+| `incident_group.last_reported_at` | Time window for grouping and auto-verification |
+| `incident_group.reviewed_at`, `resolved_at` | When security verified, rejected or resolved it |
+| `incident_group.public_note`, `staff_note` | A note everyone sees on the map; an internal note for security |
+| `incident_group.updated_at` | Auditing |
+| `incident_report.category`, `severity_level` | What each person chose; the incident keeps the highest severity |
+| `incident_report.accuracy_m` | GPS accuracy when the pin is the phone's position |
+| `incident_report_owner` (table) | Private link from every report to its sender: "My reports", one vote per person for auto-verification, rate limiting. Readable only by its owner (no staff policy), so anonymous reports stay anonymous to security (PLAN A20) |
+| Storage bucket `incident-photos` | Private; photos are served to staff through the API after EXIF removal |
 | `location_log.alert_id` (and `trip_id` nullable) | Location history of an SOS raised outside a journey; each row belongs to exactly one trip or alert |
 | `trip_end_reason` value `RESOLVED_BY_SECURITY` | Security resolved the overdue alert of an escalated journey |
 | `safe_point.name` + `category` | The ERD's single `name_and_category` column, split for filtering (PLAN.md A16) |

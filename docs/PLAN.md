@@ -16,7 +16,7 @@ External = needs credentials or institutional data the team must supply.
 | 1. Setup | Monorepo, database schema, auth, RLS, shared design tokens | Done (6 Nov 2026) |
 | 2. Module 1 | Live trip sharing, ETA watchdog, escalation, tracking page | Done (6 Nov 2026) |
 | 3. Module 2 | Hold-to-confirm SOS, silent SOS, emergency calling, safe point navigator (+ M4 response workflow and safe point management) | Done (7 Nov 2026) |
-| 4. Module 3 | Incident reporting, photo upload, auto-verification, safety map | Planned |
+| 4. Module 3 | Incident reporting, photo upload, auto-verification, safety map (+ M4 report review) | Done (10 Nov 2026) |
 | 5. Module 4 | Full dashboard: response workflow, report review, safe points, announcements, analytics | Planned |
 | 6. Integration | Cross-module tests, field test on campus, final documentation | Planned |
 
@@ -64,7 +64,7 @@ Test files: server tests are in `apps/server/test/`, Flutter tests in
 | State machine: Active, Grace Prompt, Escalated (+ Completed, Cancelled) | `tripStateMachine.js` + conditional updates | `tripStateMachine.test.js` | Done |
 | No duplicate escalation | Conditional UPDATE + `FOR UPDATE SKIP LOCKED` + unique ETA alert per trip | `watchdog.test.js` "never escalates the same trip twice" | Done |
 | Safe arrival ends monitoring; contacts see it | `ARRIVE` transition; tracking page "Arrived safely" | `tripsApi.test.js`, `trip_tracker_test.dart` | Done |
-| Hazard check before walking (integration with Module 3 map) | Requires Module 3 | | Planned (Module 3) |
+| Hazard check before walking (integration with Module 3 map) | `route-preview` returns verified incidents within 50 m of the route (`incidentService.alongRoute`); warning in `start_journey_screen.dart` | `incidents.test.js` "warns about verified incidents along a planned walk" | Done |
 | Journey history | `GET /api/trips`, `history_screen.dart` | `tripsApi.test.js` "lists journey history" | Done |
 | Offline buffering and reconnection | `TripTracker` buffer + HTTP batch upload, socket `connectionStateRecovery` | `trip_tracker_test.dart` "buffers samples while offline" | Done |
 | Background location on the phone | Android foreground service, iOS background mode | Needs a real device | Partial (not device-tested yet) |
@@ -93,13 +93,16 @@ Test files: server tests are in `apps/server/test/`, Flutter tests in
 
 ### Module 3: Incident reporting and safety map
 
-| Proposal requirement | Status |
-|---|---|
-| Categorised, anonymous reports with severity, location, description, optional photo | Planned |
-| Manual verification by security staff | Planned |
-| Colour-coded safety map (verified only), bounding-box query | Planned |
-| Auto-verify: 3+ independent users, 50 m, 30 min (`ST_DWithin`) | Planned |
-| Report status tracking: pending, verified, rejected, resolved | Planned |
+| Proposal requirement | Implementation | Test | Status |
+|---|---|---|---|
+| Categorised reports with category, severity, location, description | `POST /api/incidents`, `incidentService.submit`, `report_incident_screen.dart` (pin from GPS, tap to move) | `incidents.test.js` "stores a pending report…", `incidents_test.dart` report form | Done |
+| Anonymous reporting | `is_anonymous`, `user_id` null on the report; private `incident_report_owner` link not readable by staff (A20) | `incidents.test.js` "keeps anonymous reporters hidden…", RLS "never who sent an anonymous one" | Done |
+| Optional photo (Supabase Storage) | `POST /api/incidents/reports/:id/photo`, private bucket `incident-photos`, EXIF/GPS removed (`photoStorage.cleanPhoto`); staff view through the API | `incidents.test.js` "optional photo" | Done (code); External (service-role key for Storage) |
+| Reports go to the dashboard for manual review | `incident:new` to staff; `ReportsPage.jsx` (verify with severity and notes, reject, resolve) | `incidents.test.js` "security review", `socket.test.js` | Done (browser-tested) |
+| Colour-coded safety map, verified only | `safety_map_screen.dart` (pins coloured by severity, with icon and word) | `incidents.test.js` "returns only verified incidents…" | Done |
+| Bounding-box query (only the visible area) | `GET /api/incidents/map?south&west&north&east`, `centroid_geom && ST_MakeEnvelope` with GiST index; larger than 0.5° refused | `incidents.test.js` bbox tests, `incidents_test.dart` repository | Done |
+| Auto-verify: 3+ different users, 50 m, 30 min (`ST_DWithin`) | Spatio-temporal grouping in `incidentService.submit` (advisory lock per category) | `incidents.test.js` auto-verification suite (incl. distance, window, category, concurrent reports) | Done |
+| Report status tracking: pending, verified, rejected, resolved | `GET /api/incidents/mine`, `incident:status` socket event, `my_reports_screen.dart` | `incidents.test.js`, `socket.test.js`, `incidents_test.dart` "follow status changes live" | Done |
 
 ### Module 4: Admin security dashboard
 
@@ -108,7 +111,7 @@ Test files: server tests are in `apps/server/test/`, Flutter tests in
 | Staff login with admin email allow-list, Supabase Auth, RBAC, RLS | `security_staff`, `is_security_staff()`, `requireSecurityStaff`, dashboard login | Done (tests: `tripsApi.test.js`, `trackingAndRls.test.js`) |
 | Emergency alert with alarm, live location, identity, time, type | `EmergenciesPage.jsx`, `alarm.js` | Done for SOS and overdue journeys (browser-tested) |
 | Status workflow Received, On the Way, Arrived, Resolved | `POST /api/staff/alerts/:id/status`, `ResponsePanel.jsx`, timeline with officer and note; resolving an overdue alert closes the journey | Done (tests: `sos.test.js` workflow, `socket.test.js`) |
-| Report management, grouping, verification | | Planned |
+| Report management, grouping, verification | `/api/staff/incidents` (verify, reject, resolve, merge nearby duplicates), `ReportsPage.jsx` | Done (tests: `incidents.test.js` "security review") |
 | Safe haven and campus resource management | `SafePointsPage.jsx` (pin on map, hours editor, contacts, activate), `/api/staff/safe-points` | Done (tests: `safePoints.test.js` management) |
 | Security announcements | | Planned |
 | Analytics from real data | | Planned |
@@ -130,6 +133,7 @@ every column added beyond the ERD.
 | Firebase project + service account | Push notifications (grace prompt) | server `.env` + mobile dart-defines |
 | OSRM foot-routing server for production | Routing beyond fair-use demo limits | `OSRM_BASE_URL` |
 | USM Security hotline number | Module 2 calling | +604-653 4999 (proposal Figure 1.1 and team list, 7 Nov 2026); `USM_SECURITY_EMERGENCY` dart-define |
+| Supabase Storage service-role key | Report photos (Module 3) | `SUPABASE_SERVICE_ROLE_KEY` in `apps/server/.env` |
 | Map location of each safe point | Module 2 navigator | Pin in the dashboard (Safe points page); the supplied list has no coordinates |
 | Institutional approval to connect to JKUSM | Real deployment | Supervisor / JKUSM |
 
@@ -156,12 +160,17 @@ every column added beyond the ERD.
 | A17 | Should an SOS notify trusted contacts? Module 2 text mentions only security; 5.2.3 2B/2C say SOS alerts and live location go to configured channels and contacts | Contacts are notified and get a live link |
 | A18 | What closes an SOS: the user or security? | The user can mark themselves safe (sharing stops), but only security resolves the alert |
 | A19 | On 9 Nov 2026 the team replaced the mandatory "Dark mode: orange & pink" palette with a new UI requirement | Adopted the Hallmark "Dusk" theme for every surface (dashboard, tracking page, Flutter app, new landing site). See `docs/design.md`. Dusk has no red: emergencies use the apricot accent, always with an icon and words |
+| A20 | "Users can report anonymously", but reports must also count "independent users" for auto-verification and let the reporter track status | Anonymous reports store no `user_id`; a separate `incident_report_owner` row links the report to the account. RLS lets only the owner read it, never security staff, and the API never returns it. The app tells users their name is hidden from USM Security |
+| A21 | The proposal gives example categories (stray animals, broken lighting, harassment, suspicious activities) but no full list | Suspicious activity, harassment, theft, broken lighting, stray animal, unsafe path, other (in `packages/shared` and `constants.dart`). Team can change the list in the migration enum and both constant files |
+| A22 | How do reports become one incident? | A report joins the nearest pending or verified incident of the same category whose centre is within 50 m and which was reported in the last 30 minutes; otherwise it starts a new one. Older duplicates are merged by security on the dashboard. A rejected or resolved incident is never reopened |
+| A23 | Colour-coded pins need more than Dusk's two signal colours | Low in bone, medium in apricot, high in the coral error colour, always with an icon and the severity word (see `docs/design.md`) |
+| A24 | What does the public map show about an incident? | Category, severity, number of reports, times, how it was verified and a note written by security. Descriptions, photos and reporters are shown only to security staff |
 
 ## 7. Completion checklist (proposal acceptance criteria)
 
 | # | Criterion | State |
 |---|---|---|
-| 1 | All four modules implemented | Modules 1 and 2 done; Module 4 partly (response workflow, safe points); Module 3 and rest of 4 planned |
+| 1 | All four modules implemented | Modules 1, 2 and 3 done; Module 4 partly (response workflow, safe points, report review); announcements and analytics planned |
 | 3 | Mobile app talks to the backend | Done (REST + Socket.io; web build verified against local server) |
 | 4 | Dashboard receives real-time information | Done for ETA escalations |
 | 5 | Tracking page works through a secure link | Done |
@@ -173,9 +182,10 @@ every column added beyond the ERD.
 | 11 | Safe point navigation uses spatial queries | Done (k-NN + opening hours + walking time) |
 | 15 | Security manage emergency responses | Done |
 | 17 | Safe points can be managed | Done |
-| 12-14, 16, 18 | Reports, auto-verification, report management, announcements | Planned (Modules 3-4) |
+| 12-14, 16 | Reports, auto-verification, report management | Done (Module 3) |
+| 18 | Announcements | Planned (Module 4) |
 | 19 | Database security policies | Done for current tables (RLS tested) |
-| 20 | Palette followed | Done (tokens in `packages/shared/styles/tokens.css`, `apps/mobile/lib/core/theme.dart`) |
+| 20 | Palette followed | Done: Dusk theme since 9 Nov 2026 (A19), tokens in `packages/shared/styles/tokens.css`, `apps/mobile/lib/core/theme.dart` |
 | 21 | Responsive | Tracking page checked at phone and desktop widths; dashboard has a tablet layout |
-| 22 | Important functionality tested | 75 server tests, 31 Flutter tests |
+| 22 | Important functionality tested | 99 server tests, 37 Flutter tests |
 | 24 | No fabricated integrations or statistics | Unconfigured channels report "skipped"; sample data is labelled |

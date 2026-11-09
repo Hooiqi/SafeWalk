@@ -30,7 +30,7 @@ export const locationSampleSchema = z
 const tripParams = z.object({ tripId: z.uuid() });
 const extendSchema = z.object({ minutes: z.union([z.literal(5), z.literal(10), z.literal(15)]) }).strict();
 
-export function tripRoutes({ tripService, routing }) {
+export function tripRoutes({ tripService, routing, incidentService }) {
   const router = Router();
   router.use(requireAppUser);
 
@@ -50,7 +50,10 @@ export function tripRoutes({ tripService, routing }) {
     perUser(30),
     validate({ body: z.object({ origin: latLngSchema, destination: latLngSchema }).strict() }),
     async (req, res) => {
-      res.json(await routing.walkingRoute(req.valid.body.origin, req.valid.body.destination));
+      const route = await routing.walkingRoute(req.valid.body.origin, req.valid.body.destination);
+      // Hazard check before walking (Module 3 integration): verified incidents near the route.
+      const hazards = incidentService ? await incidentService.alongRoute(route.geometry?.coordinates) : [];
+      res.json({ ...route, hazards });
     },
   );
 

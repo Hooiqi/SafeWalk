@@ -139,3 +139,56 @@ class SosRepository {
   Future<void> uploadLocations(String alertId, List<Map<String, dynamic>> samples) =>
       _api.post('/api/sos/$alertId/locations', {'samples': samples});
 }
+
+/// Module 3: incident reports and the shared safety map.
+class IncidentsRepository {
+  IncidentsRepository(this._api);
+  final ApiClient _api;
+
+  Future<MyReport> submit({
+    required String category,
+    required String severity,
+    required String description,
+    required LatLng location,
+    required bool anonymous,
+    required String requestId,
+    double? accuracyM,
+  }) async =>
+      MyReport.fromJson(await _api.post('/api/incidents', {
+        'category': category,
+        'severity_level': severity,
+        'description': description.trim(),
+        'location': pointJson(location),
+        'is_anonymous': anonymous,
+        'client_request_id': requestId,
+        'accuracy_m': ?accuracyM,
+      }) as Map<String, dynamic>);
+
+  /// Optional photo, sent right after the report (JPEG or PNG).
+  Future<void> attachPhoto(String reportId, List<int> bytes, {String contentType = 'image/jpeg'}) =>
+      _api.postBytes('/api/incidents/reports/$reportId/photo', bytes, contentType);
+
+  Future<List<MyReport>> mine() async {
+    final body = await _api.get('/api/incidents/mine') as Map<String, dynamic>;
+    return [for (final r in body['reports'] as List) MyReport.fromJson(r as Map<String, dynamic>)];
+  }
+
+  /// Verified incidents inside the visible map area only.
+  Future<({List<Incident> incidents, bool truncated})> inArea({
+    required double south,
+    required double west,
+    required double north,
+    required double east,
+  }) async {
+    String f(double v) => v.toStringAsFixed(6);
+    final body = await _api.get('/api/incidents/map?south=${f(south)}&west=${f(west)}&north=${f(north)}&east=${f(east)}')
+        as Map<String, dynamic>;
+    return (
+      incidents: [for (final i in body['incidents'] as List) Incident.fromJson(i as Map<String, dynamic>)],
+      truncated: body['truncated'] as bool? ?? false,
+    );
+  }
+
+  Future<Incident> get(String incidentId) async =>
+      Incident.fromJson(await _api.get('/api/incidents/$incidentId') as Map<String, dynamic>);
+}
