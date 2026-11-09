@@ -56,6 +56,13 @@ Illegal transitions return `409 INVALID_TRIP_STATE`.
 | GET | `/api/incidents/map?south=&west=&north=&east=` | | Verified incidents in the visible area only (max 0.5° each way), highest severity first, `truncated` above 200 |
 | GET | `/api/incidents/:groupId` | | One verified or resolved incident, or one the person reported. No reporters, descriptions or photos |
 
+### Module 4: announcements
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/announcements` | Live announcements (started, not ended, not withdrawn): urgent first, then newest. `{ announce_id, title, message_body, priority, published_at, expires_at, updated_at }`; no staff names |
+| GET | `/api/announcements/:id` | One live announcement, otherwise 404 |
+
 ## Security staff (`requireSecurityStaff`)
 
 | Method | Path | Description |
@@ -74,6 +81,11 @@ Illegal transitions return `409 INVALID_TRIP_STATE`.
 | POST | `/api/staff/incidents/:groupId/reject` | Remove a false report (pending or verified to REJECTED) |
 | POST | `/api/staff/incidents/:groupId/resolve` | Verified to RESOLVED (leaves the map). Invalid steps `409 INVALID_TRANSITION` |
 | POST | `/api/staff/incidents/:groupId/merge` | `{ into_group_id }`: moves every report into the other incident and deletes this one |
+| GET | `/api/staff/announcements?state=SCHEDULED\|LIVE\|EXPIRED\|WITHDRAWN` | All announcements with `state`, `staff_name`, `announced_at`, `push_summary` (`{ recipients, sent, failed, skipped }` for URGENT) |
+| POST | `/api/staff/announcements` | `{ title (3-120), message_body (1-2000), priority: INFO\|ADVISORY\|URGENT, published_at? (empty = now, future = scheduled), expires_at? }`. `400` when the end is before the start or already past |
+| PATCH | `/api/staff/announcements/:id` | Edit title, message, priority, end time; move the start of a scheduled one only (`409 ALREADY_PUBLISHED`). Raising a live one to URGENT pushes it once. Withdrawn: `409 ANNOUNCEMENT_WITHDRAWN` |
+| POST | `/api/staff/announcements/:id/withdraw` | Take it down everywhere; records who and when. Twice: `409` |
+| GET | `/api/staff/analytics?days=7\|30\|90\|365` | Campus safety analytics from stored records (default 30 days): `alerts` (by trigger, response times `{ n, median_s, p90_s }`), `journeys`, `reports` (by status, by category, review rates), `trend` (per day, or per week above 31 days), `by_hour`, `hotspots`, `points`, `repairs`. Medians and rates are `null` below `min_sample` (3) values. Malaysia time |
 
 ## Socket.io
 
@@ -96,4 +108,6 @@ Every server event includes `event_id` (for de-duplication) and `emitted_at`.
 | `incident:new` / `incident:updated` | server to client | staff | `{ incident }` (a merged incident arrives as `{ group_id, merged_into, status: 'MERGED' }`) |
 | `incident:status` | server to client | each reporter of the incident | `{ report_id, group_id, status, auto_verified, public_note }` |
 | `incident:map` | server to client | every signed-in app user | `{ group_id, status, location }`: verified pins changed, reload the visible area |
+| `announcement:live` | server to client | every signed-in app user, staff | `{ announcement }`: went live (now or at its scheduled time) |
+| `announcement:updated` | server to client | every signed-in app user, staff | `{ announcement, state }`: edited, or `state: WITHDRAWN` (hide it) |
 | `auth:expired` | server to client | any | the token expired; reconnect with a fresh one |

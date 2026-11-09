@@ -517,3 +517,37 @@ class MyReport {
         publicNote: publicNote ?? this.publicNote,
       );
 }
+
+/// A safety announcement from USM Security (Module 4).
+class Announcement {
+  const Announcement({
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.priority,
+    required this.publishedAt,
+    this.expiresAt,
+    this.updatedAt,
+  });
+
+  factory Announcement.fromJson(Map<String, dynamic> j) => Announcement(
+        id: j['announce_id'] as String,
+        title: j['title'] as String,
+        body: j['message_body'] as String,
+        priority: j['priority'] as String,
+        publishedAt: _date(j['published_at'])!,
+        expiresAt: _date(j['expires_at']),
+        updatedAt: _date(j['updated_at']),
+      );
+
+  final String id;
+  final String title;
+  final String body;
+  final String priority;
+  final DateTime publishedAt;
+  final DateTime? expiresAt;
+  final DateTime? updatedAt;
+
+  bool get isUrgent => priority == 'URGENT';
+  bool isLiveAt(DateTime now) => !publishedAt.isAfter(now) && (expiresAt == null || expiresAt!.isAfter(now));
+}

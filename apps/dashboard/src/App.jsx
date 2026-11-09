@@ -5,9 +5,12 @@ import EmergenciesPage from './pages/EmergenciesPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 import SafePointsPage from './pages/SafePointsPage.jsx';
+import AnnouncementsPage from './pages/AnnouncementsPage.jsx';
+import AnalyticsPage from './pages/AnalyticsPage.jsx';
 import { useAuth } from './lib/useAuth.js';
 import { useEmergencies } from './lib/useEmergencies.js';
 import { useIncidents } from './lib/useIncidents.js';
+import { useAnnouncements } from './lib/useAnnouncements.js';
 import { supabaseConfigured } from './lib/supabase.js';
 
 function StaffShell({ auth }) {
@@ -15,9 +18,11 @@ function StaffShell({ auth }) {
   const open = emergencies.alerts.filter((a) => a.status !== 'RESOLVED').length;
   const [reportFilter, setReportFilter] = useState('OPEN');
   const reports = useIncidents(auth.session.access_token, reportFilter);
+  const announcements = useAnnouncements(auth.session.access_token);
+  const liveAnnouncements = announcements.announcements.filter((a) => a.state === 'LIVE').length;
   return (
     <div className="shell">
-      <TopBar staff={auth.staff} onSignOut={auth.signOut} openCount={open} pendingReports={reports.pendingCount} />
+      <TopBar staff={auth.staff} onSignOut={auth.signOut} openCount={open} pendingReports={reports.pendingCount} liveAnnouncements={liveAnnouncements} />
       <main className="shell__main">
         <Routes>
           <Route path="/emergencies" element={<EmergenciesPage accessToken={auth.session.access_token} emergencies={emergencies} />} />
@@ -26,6 +31,8 @@ function StaffShell({ auth }) {
             element={<ReportsPage accessToken={auth.session.access_token} reports={reports} filter={reportFilter} onFilter={setReportFilter} />}
           />
           <Route path="/safe-points" element={<SafePointsPage accessToken={auth.session.access_token} />} />
+          <Route path="/announcements" element={<AnnouncementsPage accessToken={auth.session.access_token} announcements={announcements} />} />
+          <Route path="/analytics" element={<AnalyticsPage accessToken={auth.session.access_token} />} />
           <Route path="*" element={<Navigate to="/emergencies" replace />} />
         </Routes>
       </main>

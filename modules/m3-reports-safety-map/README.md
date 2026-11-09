@@ -39,7 +39,7 @@ Let students report incidents and unsafe places, and let everyone see verified i
 ## Gives to other modules
 M4 receives PENDING reports in its review queue, verifies or rejects them, and the verified ones appear on this map.
 
-## Progress (10 Nov 2026)
+## Progress (9 Nov 2026)
 - [x] Report form and save (category, severity, pin, description, anonymous, optional photo)
 - [x] Safety map with colour-coded pins, loaded for the visible area only
 - [x] Detail sheet

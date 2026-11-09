@@ -114,7 +114,24 @@ location"), click its position on the map and press **Save**. Hours, phone
 numbers and notes can be corrected on the same form. The student app shows
 only points that are active and pinned.
 
-## 7. Demonstrating Module 3
+## 7. Demonstrating Module 4
+
+1. Dashboard, **Announcements**, **New announcement**: write a title and message,
+   choose Information, Advisory or Urgent, and publish now or at a set time
+   (Malaysia time), with an optional end time. The preview shows how it looks in
+   the app.
+2. In the app, the announcement appears on **Home** at once (urgent ones at the
+   top) and under **Announcements**. Urgent ones are also sent as a push
+   notification when Firebase is configured; the dashboard shows how many were
+   sent.
+3. **Edit** changes it on every phone; **Withdraw** removes it everywhere.
+4. Dashboard, **Analytics**: choose 7 days, 30 days, 90 days or 12 months.
+   Every figure comes from stored alerts, journeys and reports. A median needs
+   at least three values, otherwise the page says there is not enough data.
+   **Repair list** lists confirmed broken lighting and unsafe paths that are
+   not resolved, and **Download CSV** exports it for the facilities team.
+
+## 8. Demonstrating Module 3
 
 Photos: in development the server keeps them in `PHOTO_STORAGE_DIR`
 (`./.data/incident-photos` in `.env.example`). With a Supabase project, set
@@ -134,7 +151,7 @@ Photos: in development the server keeps them in `PHOTO_STORAGE_DIR`
    within 50 m and 30 minutes put the incident on the map without review.
 5. Plan a walk that passes a verified incident: the start screen warns about it.
 
-## 8. Demonstrating Module 2
+## 9. Demonstrating Module 2
 
 1. In the app, open **SOS** and hold the button for 3 seconds (or turn on
    **Silent SOS** first). A quick tap does nothing.
@@ -151,7 +168,7 @@ Photos: in development the server keeps them in `PHOTO_STORAGE_DIR`
 The emergency call buttons use `+604-653 4999` (USM Security) and `999`.
 Change them with `--dart-define=USM_SECURITY_EMERGENCY=+60...` if needed.
 
-## 9. Demonstrating Module 1
+## 10. Demonstrating Module 1
 
 For a demo without a long walk, set `DEV_ETA_OVERRIDE_SECONDS=60` in
 `apps/server/.env` (ignored in production) and restart the server.

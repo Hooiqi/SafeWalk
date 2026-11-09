@@ -7,6 +7,7 @@ import 'core/api_client.dart';
 import 'core/config.dart';
 import 'core/theme.dart';
 import 'data/repositories.dart';
+import 'features/announcements/announcements_controller.dart';
 import 'features/contacts/contacts_controller.dart';
 import 'router.dart';
 import 'services/auth_service.dart';
@@ -92,6 +93,7 @@ class _SafeWalkAppState extends State<SafeWalkApp> {
         ChangeNotifierProvider(create: (_) => ContactsController(ContactsRepository(_api))),
         ChangeNotifierProvider.value(value: _tracker),
         ChangeNotifierProvider.value(value: _sos),
+        ChangeNotifierProvider(create: (_) => AnnouncementsController(AnnouncementsRepository(_api), _realtime)),
       ],
       child: MaterialApp.router(
         title: 'SafeWalk',

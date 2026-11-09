@@ -17,6 +17,8 @@
   --color-accent: oklch(77% 0.10 274); --color-accent-ink: oklch(19% 0.035 274); --color-accent-hi: oklch(84% 0.085 274);
   --color-accent-deep: oklch(44% 0.13 274); --color-accent-soft: oklch(91% 0.038 274); --color-focus: oklch(80% 0.10 274);
   --color-accent-2: oklch(83% 0.095 62); --color-dusk: oklch(70% 0.12 330);
+  /* Chart series (dashboard analytics): periwinkle and apricot deepened into the dark-surface chart band, validated for colour-blind separation and 3:1 contrast. */
+  --color-chart-1: oklch(66% 0.15 274); --color-chart-2: oklch(66.5% 0.13 62);
   --color-day-ink: oklch(22% 0.022 268); --color-day-muted: oklch(38% 0.022 266); --color-fog: oklch(94% 0.012 70);
   --color-well: oklch(95.5% 0.008 75); --color-well-2: oklch(92% 0.010 75); --color-well-ink: oklch(21% 0.016 268); --color-well-muted: oklch(47% 0.016 265); --color-well-rule: oklch(87.5% 0.009 75); --color-card: oklch(99.5% 0.003 75);
   --glass: oklch(22% 0.018 268 / 0.58); --glass-blur: 22px;

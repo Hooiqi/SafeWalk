@@ -37,12 +37,15 @@ Verified incidents for M3's map, and notifications for M1 and M2 alerts.
 ## Notes
 M4 has the most parts and is the first thing your supervisor will want to see. Start in week 1 with fake alerts and a "simulate alert" tool, so you do not wait for M1 to M3.
 
-## Progress
-- [ ] Fake alert data and simulate tool
-- [ ] Dispatch queue and map
-- [ ] Status updates and audit trail
-- [ ] Report review queue
-- [ ] Notifications
-- [ ] Advisory broadcast
-- [ ] Role-based access
-- [ ] Integration tests with M1, M2, M3
+## Progress (9 Nov 2026)
+- [x] Staff login with the admin email allow-list and role-based access (RLS + API)
+- [x] Live emergencies: SOS and overdue journeys with alarm, live location and identity
+- [x] Status workflow (Received, On the way, Arrived, Resolved) with timeline and notes
+- [x] Report review queue: verify, reject, resolve, merge duplicates
+- [x] Safe point management: pin on the map, hours, contacts, activate
+- [x] Safety announcements: publish now or scheduled, end time, edit, withdraw; urgent ones pushed once
+- [x] Announcements on the app's home screen and in an Announcements list, updated live
+- [x] Campus safety analytics from real records: alerts and response times, journeys, reports by category, trend, time of day, hotspots, repair list with CSV
+- [x] Tests: `apps/server/test/announcements.test.js`, `analytics.test.js`, `socket.test.js`, `apps/mobile/test/announcements_test.dart`
+
+Decisions taken while building it are A25 and A26 in `docs/PLAN.md`.

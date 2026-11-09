@@ -197,6 +197,26 @@ describe('Socket.io real-time channel', () => {
     assert.equal((await map).group_id, report.body.group_id);
   });
 
+  it('tells every app user and the dashboard when an announcement goes live or is withdrawn', async () => {
+    const app = createApp(deps);
+    const staffSocket = await open({ token: officer.token });
+    const appSocket = await open({ token: student.token });
+    const liveApp = next(appSocket, 'announcement:live');
+    const liveStaff = next(staffSocket, 'announcement:live');
+    const res = await request(app)
+      .post('/api/staff/announcements')
+      .set({ Authorization: `Bearer ${officer.token}` })
+      .send({ title: 'Sample notice', message_body: 'Sample message', priority: 'INFO' });
+    assert.equal(res.status, 201, JSON.stringify(res.body));
+    assert.equal((await liveApp).announcement.announce_id, res.body.announce_id);
+    assert.equal((await liveApp).announcement.staff_name, undefined);
+    assert.equal((await liveStaff).announcement.title, 'Sample notice');
+
+    const withdrawn = next(appSocket, 'announcement:updated');
+    await request(app).post(`/api/staff/announcements/${res.body.announce_id}/withdraw`).set({ Authorization: `Bearer ${officer.token}` });
+    assert.equal((await withdrawn).state, 'WITHDRAWN');
+  });
+
   it('disconnects a socket when its session token expires', async () => {
     const shortLived = await signToken({ sub: student.id, email: student.email, expiresInSeconds: 1 });
     const s = await open({ token: shortLived });

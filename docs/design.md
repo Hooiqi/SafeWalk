@@ -30,6 +30,18 @@ proposal asks for colour-coded pins: **low** in bone (`--color-ink-2`),
 **medium** in apricot, **high** in coral (`--color-error`). Each pin also shows
 the category icon, and every severity label pairs its chevron icon with the word.
 
+Announcement priority (Module 4) reuses the same three steps: **Information**
+in bone, **Advisory** in apricot, **Urgent** in coral, each with its own icon
+(info, warning triangle, alert circle) and the word. Urgent cards get a 2px
+coral border in the app.
+
+Charts on the Analytics page use two series colours, `--color-chart-1`
+(periwinkle) and `--color-chart-2` (apricot), deepened from the accents into
+the dark-surface chart band (OKLCH L 0.48 to 0.67) and checked with a palette
+validator for colour-blind separation and 3:1 contrast. Reports are always
+series 1, alerts series 2; each chart has a legend, a hover tooltip and a
+table view.
+
 There are exactly two signals. Periwinkle means finished or fine, apricot means
 open or waiting. Neither is red (the error colour is kept for form errors), so an emergency is apricot **plus an icon and
 words** ("SOS sent", "Alert raised"); status is never shown by colour alone.

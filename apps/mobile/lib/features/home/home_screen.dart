@@ -10,6 +10,8 @@ import '../../data/repositories.dart';
 import '../../services/sos_controller.dart';
 import '../../services/trip_tracker.dart';
 import '../../widgets/common.dart';
+import '../announcements/announcement_ui.dart';
+import '../announcements/announcements_controller.dart';
 import '../contacts/contacts_controller.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -35,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
         context.read<ProfileRepository>().me(),
         context.read<TripTracker>().resume(),
         context.read<ContactsController>().load(),
+        context.read<AnnouncementsController>().load(),
       ]);
       if (mounted) setState(() => _profile = results.first as UserProfile);
     } on ApiException catch (e) {
@@ -48,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final trip = context.watch<TripTracker>().trip;
     final contacts = context.watch<ContactsController>();
     final sos = context.watch<SosController>();
+    final announcements = context.watch<AnnouncementsController>().items;
     final firstName = _profile?.fullName.split(' ').first;
 
     return Scaffold(
@@ -69,11 +73,34 @@ class _HomeScreenState extends State<HomeScreen> {
               _SosActiveCard(sending: sos.phase == SosPhase.sending),
               const SizedBox(height: 16),
             ],
+            // Urgent notices from security come before everything except an SOS.
+            for (final a in announcements.where((a) => a.isUrgent).take(2)) ...[
+              AnnouncementCard(announcement: a, compact: true, onTap: () => context.push('/announcements')),
+              const SizedBox(height: 16),
+            ],
             if (trip != null && trip.isOpen)
               _ActiveJourneyCard(trip: trip)
             else
               _StartCard(hasContacts: contacts.contacts.isNotEmpty || !contacts.loaded),
             const SizedBox(height: 16),
+            if (announcements.any((a) => !a.isUrgent)) ...[
+              AnnouncementCard(announcement: announcements.firstWhere((a) => !a.isUrgent), compact: true, onTap: () => context.push('/announcements')),
+              const SizedBox(height: 8),
+            ],
+            Card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                leading: const Icon(Icons.campaign_outlined, color: SwColors.text2),
+                title: const Text('Announcements'),
+                subtitle: Text(
+                  announcements.isEmpty ? 'Safety notices from USM Security' : '${announcements.length} from USM Security',
+                  style: text.bodySmall,
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push('/announcements'),
+              ),
+            ),
+            const SizedBox(height: 8),
             Card(
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

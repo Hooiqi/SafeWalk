@@ -7,6 +7,7 @@ import 'features/auth/welcome_screen.dart';
 import 'features/contacts/contact_form_screen.dart';
 import 'features/contacts/contacts_screen.dart';
 import 'features/history/history_screen.dart';
+import 'features/announcements/announcements_screen.dart';
 import 'features/incidents/my_reports_screen.dart';
 import 'features/incidents/report_incident_screen.dart';
 import 'features/incidents/safety_map_screen.dart';
@@ -42,6 +43,7 @@ GoRouter buildRouter(AuthService auth) => GoRouter(
         GoRoute(path: '/incidents', builder: (_, _) => const SafetyMapScreen()),
         GoRoute(path: '/incidents/report', builder: (_, _) => const ReportIncidentScreen()),
         GoRoute(path: '/incidents/mine', builder: (_, _) => const MyReportsScreen()),
+        GoRoute(path: '/announcements', builder: (_, _) => const AnnouncementsScreen()),
         StatefulShellRoute.indexedStack(
           builder: (_, _, shell) => AppShell(shell: shell),
           branches: [

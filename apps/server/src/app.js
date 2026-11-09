@@ -13,6 +13,8 @@ import { staffRoutes } from './modules/alerts/staffRoutes.js';
 import { safePointRoutes, staffSafePointRoutes } from './modules/safePoints/safePointRoutes.js';
 import { sosRoutes } from './modules/sos/sosRoutes.js';
 import { incidentRoutes, staffIncidentRoutes } from './modules/incidents/incidentRoutes.js';
+import { announcementRoutes, staffAnnouncementRoutes } from './modules/announcements/announcementRoutes.js';
+import { staffAnalyticsRoutes } from './modules/analytics/analyticsRoutes.js';
 
 /** Builds the Express application. All dependencies are injected for testing. */
 export function createApp(deps) {
@@ -51,6 +53,9 @@ export function createApp(deps) {
   app.use('/api/staff/safe-points', auth, staffSafePointRoutes(deps));
   app.use('/api/incidents', auth, incidentRoutes(deps));
   app.use('/api/staff/incidents', auth, staffIncidentRoutes(deps));
+  app.use('/api/announcements', auth, announcementRoutes(deps));
+  app.use('/api/staff/announcements', auth, staffAnnouncementRoutes(deps));
+  app.use('/api/staff/analytics', auth, staffAnalyticsRoutes(deps));
   app.use('/api/staff', auth, staffRoutes(deps));
 
   app.use((_req, _res, next) => next(notFound('Route not found')));

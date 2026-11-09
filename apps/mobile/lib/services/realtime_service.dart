@@ -64,6 +64,8 @@ class RealtimeService implements RealtimeChannel {
       SocketEvents.alertStatus,
       SocketEvents.incidentStatus,
       SocketEvents.incidentMap,
+      SocketEvents.announcementLive,
+      SocketEvents.announcementUpdated,
     ]) {
       socket.on(name, (data) {
         if (data is! Map) return;

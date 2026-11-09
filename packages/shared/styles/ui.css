@@ -110,3 +110,10 @@ body { font-variant-numeric: tabular-nums; }
 .mark-incident--MEDIUM { fill: var(--color-accent-2); }
 .mark-incident--HIGH { fill: var(--color-error); }
 .mark-report { stroke: var(--color-ink); stroke-width: 1.5; fill: var(--color-paper); fill-opacity: 1; }
+
+/* Announcement priority (Module 4): same three steps as severity, always with icon and word. */
+.prio { display: inline-flex; align-items: center; gap: var(--space-3xs); font-size: var(--text-sm); font-weight: 500; white-space: nowrap; }
+.prio svg { width: 16px; height: 16px; flex: none; }
+.prio--INFO { color: var(--color-ink-2); }
+.prio--ADVISORY { color: var(--color-accent-2); }
+.prio--URGENT { color: var(--color-error); }

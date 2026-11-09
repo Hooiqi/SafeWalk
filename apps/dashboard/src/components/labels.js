@@ -75,3 +75,15 @@ export const INCIDENT_STATUS_SHORT = { PENDING: 'Pending', VERIFIED: 'On the map
 
 /** Pending needs security (apricot); verified is handled (periwinkle); closed ones are quiet. */
 export const incidentTone = (status) => (status === 'PENDING' ? 'open' : status === 'VERIFIED' ? 'done' : '');
+
+// ---- Module 4: announcements ----------------------------------------------
+
+export const PRIORITY_LABEL = { INFO: 'Information', ADVISORY: 'Advisory', URGENT: 'Urgent' };
+export const PRIORITY_HELP = {
+  INFO: 'General notice. Shown on the home screen of the app.',
+  ADVISORY: 'Take care, for example a dark or closed path. Shown on the home screen.',
+  URGENT: 'Act now. Shown first on the home screen and sent as a push notification to every phone.',
+};
+export const ANNOUNCEMENT_STATE_LABEL = { SCHEDULED: 'Scheduled', LIVE: 'Live', EXPIRED: 'Ended', WITHDRAWN: 'Withdrawn' };
+/** Live is periwinkle (out and working); scheduled is apricot (waiting); ended ones are quiet. */
+export const announcementTone = (state) => (state === 'LIVE' ? 'done' : state === 'SCHEDULED' ? 'open' : '');

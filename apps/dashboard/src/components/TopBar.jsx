@@ -1,8 +1,8 @@
 import { LogOut } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
-/** The dashboard shell: one top bar. Three destinations do not earn a sidebar. */
-export default function TopBar({ staff, onSignOut, openCount, pendingReports = 0 }) {
+/** The dashboard shell: one top bar. Five short destinations still fit one row on a desktop. */
+export default function TopBar({ staff, onSignOut, openCount, pendingReports = 0, liveAnnouncements = 0 }) {
   return (
     <header className="topbar">
       <div className="topbar__inner">
@@ -28,6 +28,17 @@ export default function TopBar({ staff, onSignOut, openCount, pendingReports = 0
           </NavLink>
           <NavLink to="/safe-points" className="topbar__link">
             Safe points
+          </NavLink>
+          <NavLink to="/announcements" className="topbar__link">
+            Announcements
+            {liveAnnouncements > 0 && (
+              <span className="topbar__count topbar__count--quiet num" aria-label={`${liveAnnouncements} live`}>
+                {liveAnnouncements}
+              </span>
+            )}
+          </NavLink>
+          <NavLink to="/analytics" className="topbar__link">
+            Analytics
           </NavLink>
         </nav>
         <div className="topbar__staff">

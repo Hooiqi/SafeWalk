@@ -74,6 +74,13 @@ export const INCIDENT_STATUS = Object.freeze({
 /** Proposal Module 3: 3 or more users, within 50 m, over a 30-minute window. */
 export const AUTO_VERIFY = Object.freeze({ MIN_REPORTERS: 3, RADIUS_M: 50, WINDOW_MINUTES: 30 });
 
+/** Module 4: announcement priority (ERD: VARCHAR). URGENT is also pushed to phones. */
+export const ANNOUNCEMENT_PRIORITY = Object.freeze({
+  INFO: 'INFO',
+  ADVISORY: 'ADVISORY',
+  URGENT: 'URGENT',
+});
+
 /** Socket.io event names. Server events carry { event_id, emitted_at, ...data }. */
 export const SOCKET_EVENTS = Object.freeze({
   // client -> server
@@ -92,6 +99,8 @@ export const SOCKET_EVENTS = Object.freeze({
   INCIDENT_UPDATED: 'incident:updated', // staff: an incident changed (new report, review, merge)
   INCIDENT_STATUS: 'incident:status', // reporter: the status of one of their reports changed
   INCIDENT_MAP: 'incident:map', // every app user: verified pins changed, reload the visible area
+  ANNOUNCEMENT_LIVE: 'announcement:live', // every app user and staff: an announcement went live
+  ANNOUNCEMENT_UPDATED: 'announcement:updated', // every app user and staff: edited, withdrawn or expired
   AUTH_EXPIRED: 'auth:expired',
 });
 

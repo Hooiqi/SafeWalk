@@ -16,8 +16,8 @@ External = needs credentials or institutional data the team must supply.
 | 1. Setup | Monorepo, database schema, auth, RLS, shared design tokens | Done (6 Nov 2026) |
 | 2. Module 1 | Live trip sharing, ETA watchdog, escalation, tracking page | Done (6 Nov 2026) |
 | 3. Module 2 | Hold-to-confirm SOS, silent SOS, emergency calling, safe point navigator (+ M4 response workflow and safe point management) | Done (7 Nov 2026) |
-| 4. Module 3 | Incident reporting, photo upload, auto-verification, safety map (+ M4 report review) | Done (10 Nov 2026) |
-| 5. Module 4 | Full dashboard: response workflow, report review, safe points, announcements, analytics | Planned |
+| 4. Module 3 | Incident reporting, photo upload, auto-verification, safety map (+ M4 report review) | Done (9 Nov 2026) |
+| 5. Module 4 | Full dashboard: response workflow, report review, safe points, announcements, analytics | Done (9 Nov 2026) |
 | 6. Integration | Cross-module tests, field test on campus, final documentation | Planned |
 
 The proposal's Gantt chart (Diagram 10.1) puts Modules 1 and 2 in Sprint 2,
@@ -113,8 +113,8 @@ Test files: server tests are in `apps/server/test/`, Flutter tests in
 | Status workflow Received, On the Way, Arrived, Resolved | `POST /api/staff/alerts/:id/status`, `ResponsePanel.jsx`, timeline with officer and note; resolving an overdue alert closes the journey | Done (tests: `sos.test.js` workflow, `socket.test.js`) |
 | Report management, grouping, verification | `/api/staff/incidents` (verify, reject, resolve, merge nearby duplicates), `ReportsPage.jsx` | Done (tests: `incidents.test.js` "security review") |
 | Safe haven and campus resource management | `SafePointsPage.jsx` (pin on map, hours editor, contacts, activate), `/api/staff/safe-points` | Done (tests: `safePoints.test.js` management) |
-| Security announcements | | Planned |
-| Analytics from real data | | Planned |
+| Security announcements ("Publish safety announcement", objective 4) | `announcement` table (ERD ANNOUNCEMENT), `/api/staff/announcements` (create, schedule, edit, withdraw, optional end time), `AnnouncementsPage.jsx` with an app preview; app: `GET /api/announcements`, home screen cards and `announcements_screen.dart`; `announcement:live` / `announcement:updated` socket events; URGENT pushed by FCM once (A25) | `announcements.test.js` (publishing, scheduling, expiry, editing, withdrawing, push once, access control, RLS), `socket.test.js` "tells every app user and the dashboard…", `announcements_test.dart` | Done |
+| Analytics from real data ("View campus safety analytics"; section 6 "fixing unlit pathways") | `GET /api/staff/analytics?days=7|30|90|365` (`analyticsService.js`): alerts by type, time to acknowledge / arrive / resolve from `alert_status_log`, journeys and escalations, reports by category and review outcome, trend per day or week, hour of day, hotspots (`ST_ClusterDBSCAN`, 75 m), repair list of open lighting and path problems with CSV export; `AnalyticsPage.jsx` (A26) | `analytics.test.js` (every figure checked against seeded records) | Done |
 
 ## 4. Database (proposal 5.2.4, Diagram 12.5)
 
@@ -130,7 +130,7 @@ every column added beyond the ERD.
 | Twilio account + sender number | SMS to trusted contacts | `apps/server/.env` |
 | Telegram bot token | Telegram alerts | `apps/server/.env` |
 | SMTP account | Email alerts | `apps/server/.env` |
-| Firebase project + service account | Push notifications (grace prompt) | server `.env` + mobile dart-defines |
+| Firebase project + service account | Push notifications (grace prompt, urgent announcements) | server `.env` + mobile dart-defines |
 | OSRM foot-routing server for production | Routing beyond fair-use demo limits | `OSRM_BASE_URL` |
 | USM Security hotline number | Module 2 calling | +604-653 4999 (proposal Figure 1.1 and team list, 7 Nov 2026); `USM_SECURITY_EMERGENCY` dart-define |
 | Supabase Storage service-role key | Report photos (Module 3) | `SUPABASE_SERVICE_ROLE_KEY` in `apps/server/.env` |
@@ -165,14 +165,16 @@ every column added beyond the ERD.
 | A22 | How do reports become one incident? | A report joins the nearest pending or verified incident of the same category whose centre is within 50 m and which was reported in the last 30 minutes; otherwise it starts a new one. Older duplicates are merged by security on the dashboard. A rejected or resolved incident is never reopened |
 | A23 | Colour-coded pins need more than Dusk's two signal colours | Low in bone, medium in apricot, high in the coral error colour, always with an icon and the severity word (see `docs/design.md`) |
 | A24 | What does the public map show about an incident? | Category, severity, number of reports, times, how it was verified and a note written by security. Descriptions, photos and reporters are shown only to security staff |
+| A25 | The ERD gives announcements a `priority` (VARCHAR) but no values, and the proposal does not say how users are told | Three priorities: Information, Advisory and Urgent. Every live announcement appears on the app's home screen (urgent ones first, above the journey card) and in an Announcements list; URGENT ones are also pushed (FCM) once to every registered phone. Staff can schedule a start time, set an end time, edit and withdraw. A live announcement's start time cannot move; raising it to Urgent pushes it once. Same colour steps as severity (A23) |
+| A26 | What should "analyse campus safety data" show? | Only figures computed from SafeWalk's own records: alert counts and response times (first staff action, arrival, resolution), journeys and escalation rate, reports by category with the review outcome, rejected-as-false rate, reports and alerts over time and by hour, places where confirmed incidents repeat (within 75 m), and a repair list of confirmed broken lighting and unsafe paths. A median or rate is shown only with at least 3 values, otherwise the dashboard says there is not enough data. Malaysia time throughout |
 
 ## 7. Completion checklist (proposal acceptance criteria)
 
 | # | Criterion | State |
 |---|---|---|
-| 1 | All four modules implemented | Modules 1, 2 and 3 done; Module 4 partly (response workflow, safe points, report review); announcements and analytics planned |
+| 1 | All four modules implemented | Done (Modules 1 to 4, including announcements and analytics from real records); campus field test still to do |
 | 3 | Mobile app talks to the backend | Done (REST + Socket.io; web build verified against local server) |
-| 4 | Dashboard receives real-time information | Done for ETA escalations |
+| 4 | Dashboard receives real-time information | Done (alerts, positions, reports, announcements) |
 | 5 | Tracking page works through a secure link | Done |
 | 6 | ETA watchdog runs server-side | Done |
 | 7 | Three-minute grace period | Done (`GRACE_PERIOD_SECONDS=180`) |
@@ -183,9 +185,9 @@ every column added beyond the ERD.
 | 15 | Security manage emergency responses | Done |
 | 17 | Safe points can be managed | Done |
 | 12-14, 16 | Reports, auto-verification, report management | Done (Module 3) |
-| 18 | Announcements | Planned (Module 4) |
+| 18 | Announcements | Done (Module 4) |
 | 19 | Database security policies | Done for current tables (RLS tested) |
 | 20 | Palette followed | Done: Dusk theme since 9 Nov 2026 (A19), tokens in `packages/shared/styles/tokens.css`, `apps/mobile/lib/core/theme.dart` |
 | 21 | Responsive | Tracking page checked at phone and desktop widths; dashboard has a tablet layout |
-| 22 | Important functionality tested | 99 server tests, 37 Flutter tests |
+| 22 | Important functionality tested | 120 server tests, 43 Flutter tests |
 | 24 | No fabricated integrations or statistics | Unconfigured channels report "skipped"; sample data is labelled |

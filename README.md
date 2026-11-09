@@ -5,13 +5,13 @@ Project, Group 12). Students and staff share a live walk with trusted
 contacts; a server-side watchdog alerts those contacts and the USM Security
 Department if they do not arrive and do not respond.
 
-> **Status (10 Nov 2026):** **Module 1 (Live Trip Sharing and ETA Monitoring)**,
-> **Module 2 (Emergency SOS and Safe Point Navigator)** and **Module 3
-> (Incident Reporting and Safety Map)** are implemented and tested, together
-> with the security response workflow, safe point management and report review
-> from Module 4. The rest of Module 4 (announcements, analytics) follows the
-> proposal's sprint plan. See [docs/PLAN.md](docs/PLAN.md) for the full
-> requirements traceability matrix.
+> **Status (9 Nov 2026):** all four modules are implemented and tested:
+> **Module 1 (Live Trip Sharing and ETA Monitoring)**, **Module 2 (Emergency SOS
+> and Safe Point Navigator)**, **Module 3 (Incident Reporting and Safety Map)**
+> and **Module 4 (Admin Centralized Security Dashboard)**, including safety
+> announcements and campus safety analytics. Next: a field test on campus with
+> real credentials. See [docs/PLAN.md](docs/PLAN.md) for the full requirements
+> traceability matrix.
 >
 > **UI (9 Nov 2026):** every surface now uses the Hallmark **Dusk** theme, and a
 > public landing page (`apps/landing`) was added. See [docs/design.md](docs/design.md).
@@ -23,7 +23,7 @@ Department if they do not arrive and do not respond.
 | M1 Live trip sharing and ETA monitoring | Implemented |
 | M2 Emergency SOS and safe point navigator | Implemented |
 | M3 Incident reporting and safety map | Implemented |
-| M4 Admin centralised security dashboard | Staff login, live alerts with response workflow, safe point management and report review implemented; announcements and analytics planned |
+| M4 Admin centralised security dashboard | Implemented: staff login, live alerts with response workflow, report review, safe point management, announcements, analytics |
 
 ## Architecture (proposal 5.2.1, four tiers)
 
@@ -112,6 +112,18 @@ npm run dev:server
   expires automatically.
 - Duplicate reports more than 30 minutes apart start separate incidents;
   security merges them on the dashboard.
+
+## Known limitations (Module 4)
+
+- Urgent announcements are pushed only to phones that registered for
+  notifications, and only when Firebase is configured on the server; otherwise
+  the dashboard shows them as "not sent" and the app still shows them on Home.
+- An announcement that reaches its end time disappears from the app the next
+  time the list is loaded (no separate "ended" event).
+- Analytics count what SafeWalk recorded. Response times come from the status
+  buttons security presses, so they are only as accurate as those presses.
+- Map tiles come from OpenStreetMap; for heavy production use a tile provider
+  should be configured (`VITE_TILE_URL`, `TILE_URL`).
 
 ## Rules in one line
 

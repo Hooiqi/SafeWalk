@@ -123,6 +123,20 @@ export function createPublisher() {
       });
     },
 
+    // ---- Module 4: announcements ----------------------------------------
+
+    /** An announcement went live: app users show it, the dashboard refreshes. */
+    announcementLive(announcement) {
+      emit(rooms.appUsers, E.ANNOUNCEMENT_LIVE, { announcement });
+      emit(rooms.staff, E.ANNOUNCEMENT_LIVE, { announcement });
+    },
+
+    /** Edited or withdrawn after it went out. `state` tells apps to hide it. */
+    announcementUpdated(announcement, state) {
+      emit(rooms.appUsers, E.ANNOUNCEMENT_UPDATED, { announcement, state });
+      emit(rooms.staff, E.ANNOUNCEMENT_UPDATED, { announcement, state });
+    },
+
     /** Live position during an SOS: security and the SOS link viewers. */
     sosPosition(alertId, sample) {
       const data = { alert_id: alertId, ...sample };

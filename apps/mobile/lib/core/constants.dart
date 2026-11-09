@@ -22,7 +22,17 @@ class SocketEvents {
   static const alertStatus = 'alert:status';
   static const incidentStatus = 'incident:status';
   static const incidentMap = 'incident:map';
+  static const announcementLive = 'announcement:live';
+  static const announcementUpdated = 'announcement:updated';
   static const authExpired = 'auth:expired';
+}
+
+/// Module 4 announcements (see docs/PLAN.md A25). URGENT is also pushed.
+class AnnouncementPriority {
+  const AnnouncementPriority._();
+  static const info = 'INFO';
+  static const advisory = 'ADVISORY';
+  static const urgent = 'URGENT';
 }
 
 /// Module 3 incident reports (see docs/PLAN.md A20, A21).

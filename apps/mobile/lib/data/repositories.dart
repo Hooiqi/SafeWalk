@@ -192,3 +192,14 @@ class IncidentsRepository {
   Future<Incident> get(String incidentId) async =>
       Incident.fromJson(await _api.get('/api/incidents/$incidentId') as Map<String, dynamic>);
 }
+
+/// Module 4: live announcements from USM Security.
+class AnnouncementsRepository {
+  AnnouncementsRepository(this._api);
+  final ApiClient _api;
+
+  Future<List<Announcement>> live() async {
+    final body = await _api.get('/api/announcements') as Map<String, dynamic>;
+    return [for (final a in body['announcements'] as List) Announcement.fromJson(a as Map<String, dynamic>)];
+  }
+}

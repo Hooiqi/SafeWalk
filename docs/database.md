@@ -17,7 +17,7 @@ All location columns are `geography(…, 4326)` (WGS 84 latitude/longitude, dist
 | SAFE_POINT | `safe_point` | `20261107000100` | 21 team-supplied points loaded by `20261107000200` without coordinates (pinned by staff) |
 | INCIDENT_GROUP | `incident_group` | `20261110000100` | One incident on the map, made of one or more reports |
 | INCIDENT_REPORT | `incident_report` | `20261110000100` | `user_id` is null for anonymous reports (see `incident_report_owner`) |
-| ANNOUNCEMENT | `announcement` | Module 4 migration | Not created yet |
+| ANNOUNCEMENT | `announcement` | `20261110000200` | ERD `announce_id`, `staff_id`, `title`, `message_body`, `priority` (INFO, ADVISORY, URGENT), `published_at` (a future time schedules it) |
 
 Each module adds its own tables when it is built, so the schema is reviewed
 with the code that uses it.
@@ -48,6 +48,11 @@ with the code that uses it.
 | `incident_group.updated_at` | Auditing |
 | `incident_report.category`, `severity_level` | What each person chose; the incident keeps the highest severity |
 | `incident_report.accuracy_m` | GPS accuracy when the pin is the phone's position |
+| `announcement.expires_at` | Optional end time: hidden from the app afterwards |
+| `announcement.withdrawn_at`, `withdrawn_by` | Taken down early by security, and by whom |
+| `announcement.announced_at` | When the app was told (socket, and push if URGENT); claimed with a conditional UPDATE so it is announced and pushed once |
+| `announcement.push_summary` | Push delivery counts for the dashboard (`recipients`, `sent`, `failed`, `skipped`) |
+| `announcement.created_at`, `updated_at` | Auditing |
 | `incident_report_owner` (table) | Private link from every report to its sender: "My reports", one vote per person for auto-verification, rate limiting. Readable only by its owner (no staff policy), so anonymous reports stay anonymous to security (PLAN A20) |
 | Storage bucket `incident-photos` | Private; photos are served to staff through the API after EXIF removal |
 | `location_log.alert_id` (and `trip_id` nullable) | Location history of an SOS raised outside a journey; each row belongs to exactly one trip or alert |
@@ -88,6 +93,7 @@ Defined in `20261106000200_auth_and_rls.sql`; tested in `apps/server/test/tracki
 | `sos_alert` | read own | read, update status | none |
 | `alert_status_log` | read own alerts' log | read, insert as self | none |
 | `safe_point` | read active | read all, insert, update | none |
+| `announcement` | read live ones | read all, insert, update | none |
 
 Trips, location logs and alerts are written only by the Node server, which
 connects with the database connection string (table owner, bypasses RLS) and

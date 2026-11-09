@@ -6,7 +6,7 @@ import { attachSocketServer } from './realtime/socketServer.js';
 
 const config = loadConfig();
 const deps = await createContainer(config);
-const { logger, pool, watchdog } = deps;
+const { logger, pool, watchdog, announcementService } = deps;
 
 const httpServer = createServer(createApp(deps));
 const io = attachSocketServer(httpServer, deps);
@@ -17,11 +17,13 @@ httpServer.listen(config.PORT, () => {
     logger.warn({ seconds: config.devEtaOverrideSeconds }, 'DEV_ETA_OVERRIDE_SECONDS is set: trip ETAs are shortened for demonstration');
   }
   watchdog.start();
+  announcementService.start();
 });
 
 async function shutdown(signal) {
   logger.info({ signal }, 'shutting down');
   watchdog.stop();
+  announcementService.stop();
   io.close();
   httpServer.close();
   await pool.end();
