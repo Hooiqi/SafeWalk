@@ -51,7 +51,10 @@ export default function JourneyMap({ view }) {
 
   return (
     <MapContainer className="map" center={destination ?? current ?? [5.3559, 100.3025]} zoom={16} zoomControl attributionControl>
-      <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} className="sw-dark-tiles" maxZoom={19} />
+      {/* The page sends no referrer (the URL holds the share token), but the
+          OpenStreetMap tile servers refuse requests without one. Tiles send
+          the site's origin only, never the path with the token. */}
+      <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} className="sw-dark-tiles" maxZoom={19} referrerPolicy="origin" />
       {route.length > 1 && (
         <Polyline positions={route} className="mark-route" pathOptions={{ weight: 4, dashArray: '6 8' }} />
       )}
