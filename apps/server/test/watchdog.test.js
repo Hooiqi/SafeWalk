@@ -131,8 +131,8 @@ describe('server-side ETA watchdog', () => {
     assert.equal(alert.trigger_type, 'ETA');
     assert.equal(alert.user.full_name, 'Aina Sample');
     assert.equal(alert.user.phone_number, '+60123456789');
-    assert.equal(alert.trip.trail.length, 3, 'origin + two samples');
-    assert.equal(alert.trip.last_location.lat, 5.3578);
+    assert.equal(alert.trail.length, 3, 'origin + two samples');
+    assert.equal(alert.last_location.lat, 5.3578);
     assert.equal(alert.trip.route_geometry.type, 'LineString');
 
     // Trusted contacts are alerted on every channel they have, in parallel.
@@ -210,7 +210,7 @@ describe('server-side ETA watchdog', () => {
     const list = await request(app).get('/api/staff/alerts').set(auth(officer));
     assert.equal(list.body.alerts.length, 1);
     const detail = await request(app).get(`/api/staff/alerts/${list.body.alerts[0].alert_id}`).set(auth(officer));
-    assert.equal(detail.body.trip.trail.length, 1);
+    assert.equal(detail.body.trail.length, 1);
     assert.equal((await request(app).get('/api/staff/alerts').set(auth(student))).status, 403);
   });
 });

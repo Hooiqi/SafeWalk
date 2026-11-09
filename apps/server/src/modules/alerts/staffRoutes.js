@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { ALERT_STATUS_ORDER } from '@safewalk/shared';
 import { requireSecurityStaff, validate } from '../../http/middleware.js';
 import { notFound } from '../../lib/errors.js';
 import { getAlert, listAlerts } from './alertQueries.js';
 
 /**
- * Security dashboard endpoints. Module 1 needs the dashboard to RECEIVE
- * overdue escalations; the full response workflow (status buttons, SOS,
- * reports, safe points, announcements, analytics) is Module 4.
+ * Security dashboard: emergency alerts (overdue journeys and SOS) and the
+ * response workflow. Safe point management is in safePointRoutes.js.
  */
-export function staffRoutes({ pool }) {
+export function staffRoutes({ pool, alertStatusService }) {
   const router = Router();
   router.use(requireSecurityStaff);
 
@@ -42,6 +42,22 @@ export function staffRoutes({ pool }) {
     if (!alert) throw notFound('Alert not found');
     res.json(alert);
   });
+
+  router.post(
+    '/alerts/:alertId/status',
+    validate({
+      params: z.object({ alertId: z.uuid() }),
+      body: z
+        .object({
+          status: z.enum(ALERT_STATUS_ORDER.slice(1)),
+          note: z.string().trim().max(500).optional(),
+        })
+        .strict(),
+    }),
+    async (req, res) => {
+      res.json(await alertStatusService.update(req.identity, req.valid.params.alertId, req.valid.body));
+    },
+  );
 
   return router;
 }

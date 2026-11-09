@@ -11,7 +11,9 @@ import 'features/contacts/contacts_controller.dart';
 import 'router.dart';
 import 'services/auth_service.dart';
 import 'services/location_service.dart';
+import 'services/phone_dialer.dart';
 import 'services/push_service.dart';
+import 'services/sos_controller.dart';
 import 'services/realtime_service.dart';
 import 'services/trip_tracker.dart';
 
@@ -41,6 +43,7 @@ class _SafeWalkAppState extends State<SafeWalkApp> {
   late final LocationSource _location = GeolocatorLocationSource();
   late final RealtimeService _realtime = RealtimeService(tokenProvider: () => widget.auth.accessToken);
   late final TripTracker _tracker = TripTracker(trips: _trips, location: _location, realtime: _realtime);
+  late final SosController _sos = SosController(sos: SosRepository(_api), location: _location, realtime: _realtime);
   bool _wasSignedIn = false;
 
   @override
@@ -56,8 +59,9 @@ class _SafeWalkAppState extends State<SafeWalkApp> {
     if (signedIn && !_wasSignedIn) {
       _realtime.connect();
       PushService.registerDevice(_profiles);
-      // Pick up a journey that is still open on the server (app restart).
+      // Pick up a journey or SOS that is still open on the server (app restart).
       _tracker.resume().catchError((_) {});
+      _sos.resume().catchError((_) {});
     } else if (!signedIn && _wasSignedIn) {
       _realtime.disconnect();
     }
@@ -68,6 +72,7 @@ class _SafeWalkAppState extends State<SafeWalkApp> {
   void dispose() {
     widget.auth.removeListener(_onAuthChanged);
     _tracker.dispose();
+    _sos.dispose();
     _realtime.disconnect();
     super.dispose();
   }
@@ -80,8 +85,11 @@ class _SafeWalkAppState extends State<SafeWalkApp> {
         Provider.value(value: _trips),
         Provider.value(value: _profiles),
         Provider.value(value: _location),
+        Provider.value(value: SafePointsRepository(_api)),
+        Provider.value(value: const PhoneDialer()),
         ChangeNotifierProvider(create: (_) => ContactsController(ContactsRepository(_api))),
         ChangeNotifierProvider.value(value: _tracker),
+        ChangeNotifierProvider.value(value: _sos),
       ],
       child: MaterialApp.router(
         title: 'SafeWalk',

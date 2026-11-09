@@ -31,6 +31,10 @@ abstract class LocationSource {
 class GeolocatorLocationSource implements LocationSource {
   final _battery = Battery();
 
+  // One GPS subscription shared by every listener (a journey and an SOS can
+  // run at the same time).
+  Stream<LocationReading>? _shared;
+
   Future<void> _ensurePermission() async {
     if (!await Geolocator.isLocationServiceEnabled()) {
       throw const LocationUnavailable('Location services are turned off. Turn on GPS to share your journey.', canOpenSettings: true);
@@ -63,7 +67,12 @@ class GeolocatorLocationSource implements LocationSource {
   /// Continuous updates that keep running with the screen off: an Android
   /// foreground service (visible notification) and iOS background updates.
   @override
-  Stream<LocationReading> watch() async* {
+  Stream<LocationReading> watch() => _shared ??= _open().asBroadcastStream(onCancel: (sub) {
+        sub.cancel();
+        _shared = null;
+      });
+
+  Stream<LocationReading> _open() async* {
     await _ensurePermission();
     final LocationSettings settings;
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
@@ -72,9 +81,11 @@ class GeolocatorLocationSource implements LocationSource {
         distanceFilter: 10,
         intervalDuration: const Duration(seconds: 5),
         foregroundNotificationConfig: const ForegroundNotificationConfig(
-          notificationTitle: 'SafeWalk journey in progress',
-          notificationText: 'Your trusted contacts can see your live location until you arrive.',
-          notificationChannelName: 'Journey tracking',
+          // Deliberately neutral wording: the same notification is shown
+          // during a silent SOS.
+          notificationTitle: 'SafeWalk',
+          notificationText: 'Location sharing is on',
+          notificationChannelName: 'Location sharing',
           enableWakeLock: true,
           setOngoing: true,
         ),

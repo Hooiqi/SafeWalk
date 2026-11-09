@@ -1,5 +1,24 @@
 # M2: Emergency SOS and safe places
 
+## Status (7 Nov 2026): implemented
+
+| Part | Location |
+|---|---|
+| SOS API, idempotency, live location, "I'm safe" | `apps/server/src/modules/sos/` |
+| Safe point navigator (opening hours, k-NN, walking time, directions) | `apps/server/src/modules/safePoints/` |
+| Security response workflow | `apps/server/src/modules/alerts/alertStatusService.js`, `apps/dashboard/src/components/ResponsePanel.jsx` |
+| Safe point management | `apps/dashboard/src/pages/SafePointsPage.jsx` |
+| Mobile SOS and navigator | `apps/mobile/lib/features/{sos,safe_points}/`, `lib/services/sos_controller.dart` |
+| Tables | `safe_point`, `sos_alert` (HOLD / SILENT), `location_log.alert_id`, `alert_status_log` |
+
+- [x] Hold-to-confirm SOS (3 s), silent SOS, emergency call buttons
+- [x] SOS with GPS, identity and time to the dashboard; live location; contacts alerted
+- [x] Duplicate protection and retries
+- [x] Safe points: 21 supplied points loaded; open-now filter, k-NN, walking-time ranking, directions
+- [x] Security response workflow and safe point management
+- [ ] Security pins the 21 safe points on the map (dashboard)
+- [ ] Field test on a real phone (calling, background location during SOS)
+
 > **Note (6 Nov 2026):** the Extended Project Proposal is now the source of truth
 > for this module's scope (section 5.1 and Diagram 12.x). Code goes in the apps
 > (`apps/server/src/modules/…`, `apps/mobile/lib/features/…`, `apps/dashboard`),

@@ -17,9 +17,9 @@ abstract class RealtimeChannel {
   ValueListenable<bool> get connected;
   Stream<RealtimeEvent> get events;
 
-  /// Sends a GPS sample or heartbeat and waits for the server's acknowledgement.
-  /// Returns the server's error code, or null on success.
-  Future<String?> sendSample(String event, String tripId, Map<String, dynamic> sample);
+  /// Sends a GPS sample (trip or SOS) and waits for the server's acknowledgement.
+  /// Returns the server's error code ('OFFLINE' when not connected), or null on success.
+  Future<String?> send(String event, Map<String, dynamic> payload);
 }
 
 /// Socket.io connection for the signed-in user. The server assigns rooms after
@@ -57,7 +57,7 @@ class RealtimeService implements RealtimeChannel {
       ..onConnectError((_) => _connected.value = false)
       ..on(SocketEvents.authExpired, (_) => socket.disconnect().connect());
 
-    for (final name in [SocketEvents.tripStatus, SocketEvents.tripGracePrompt, SocketEvents.tripSignal]) {
+    for (final name in [SocketEvents.tripStatus, SocketEvents.tripGracePrompt, SocketEvents.tripSignal, SocketEvents.alertStatus]) {
       socket.on(name, (data) {
         if (data is! Map) return;
         final map = Map<String, dynamic>.from(data);
@@ -77,12 +77,12 @@ class RealtimeService implements RealtimeChannel {
   }
 
   @override
-  Future<String?> sendSample(String event, String tripId, Map<String, dynamic> sample) async {
+  Future<String?> send(String event, Map<String, dynamic> payload) async {
     final socket = _socket;
     if (socket == null || !_connected.value) return 'OFFLINE';
     try {
       final ack = await socket
-          .emitWithAckAsync(event, {'trip_id': tripId, 'sample': sample})
+          .emitWithAckAsync(event, payload)
           .timeout(const Duration(seconds: 8));
       if (ack is Map && ack['ok'] == true) return null;
       return ack is Map ? (ack['error'] as String? ?? 'ERROR') : 'ERROR';

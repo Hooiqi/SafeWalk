@@ -127,6 +127,12 @@ class _ActiveJourneyScreenState extends State<ActiveJourneyScreen> {
         title: const Text('Journey'),
         leading: IconButton(icon: const Icon(Icons.arrow_back), tooltip: 'Home', onPressed: () => context.go('/')),
         actions: [
+          if (trip.isOpen)
+            TextButton.icon(
+              onPressed: () => context.push('/sos'),
+              icon: const Icon(Icons.sos_rounded, color: SwColors.primary),
+              label: const Text('SOS', style: TextStyle(color: SwColors.primary, fontWeight: FontWeight.w800)),
+            ),
           if (trip.isOpen && trip.trackingUrl != null)
             IconButton(tooltip: 'Share tracking link', icon: const Icon(Icons.ios_share_rounded), onPressed: () => _share(trip)),
         ],

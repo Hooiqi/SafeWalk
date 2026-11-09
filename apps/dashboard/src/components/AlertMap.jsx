@@ -14,16 +14,24 @@ function FitOnChange({ bounds, alertId }) {
 }
 
 export default function AlertMap({ alert }) {
-  const trip = alert.trip;
+  const trip = alert.trigger_type === 'ETA' ? alert.trip : null;
   const route = useMemo(() => trip?.route_geometry?.coordinates?.map(([lng, lat]) => [lat, lng]) ?? [], [trip?.route_geometry]);
-  const trail = useMemo(() => trip?.trail?.map((p) => [p.lat, p.lng]) ?? [], [trip?.trail]);
-  const last = trip?.last_location ?? alert.alert_location;
+  const trail = useMemo(() => alert.trail?.map((p) => [p.lat, p.lng]) ?? [], [alert.trail]);
+  const last = alert.last_location;
   const lastPos = last ? [last.lat, last.lng] : null;
   const destination = trip ? [trip.destination.lat, trip.destination.lng] : null;
   const bounds = L.latLngBounds([...route, ...trail, ...(lastPos ? [lastPos] : []), ...(destination ? [destination] : [])]);
 
+  if (!lastPos && !destination) {
+    return (
+      <div className="alert-map alert-map--empty">
+        <p>No GPS position yet. The map appears as soon as the phone sends one.</p>
+      </div>
+    );
+  }
+
   return (
-    <MapContainer className="alert-map" center={lastPos ?? destination ?? [5.3559, 100.3025]} zoom={17}>
+    <MapContainer className="alert-map" center={lastPos ?? destination} zoom={17}>
       <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} className="sw-dark-tiles" maxZoom={19} />
       {route.length > 1 && <Polyline positions={route} pathOptions={{ color: '#A89FA3', weight: 4, opacity: 0.5, dashArray: '6 8' }} />}
       {trail.length > 1 && <Polyline positions={trail} pathOptions={{ color: '#FFA372', weight: 4 }} />}

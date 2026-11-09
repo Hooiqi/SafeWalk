@@ -27,9 +27,10 @@ void main() {
     await settle();
 
     expect(realtime.sent, hasLength(1));
-    final (event, tripId, sample) = realtime.sent.single;
+    final (event, payload) = realtime.sent.single;
+    final sample = payload['sample'] as Map<String, dynamic>;
     expect(event, 'trip:location');
-    expect(tripId, 'trip-1');
+    expect(payload['trip_id'], 'trip-1');
     expect(sample['lat'], 5.3570);
     expect(sample['recorded_at'], '2026-11-06T14:01:00.000Z');
     expect(sample['battery_level'], 55);

@@ -128,6 +128,49 @@ describe('Socket.io real-time channel', () => {
     assert.equal((await live).lat, 5.358);
   });
 
+  it('streams SOS positions to security and the SOS link, and status updates to the phone', async () => {
+    const sosUser = await createUser(deps.pool, { name: 'SOS Sample' });
+    const res = await fetch(`${baseUrl}/api/sos`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${sosUser.token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trigger_type: 'SILENT', client_request_id: crypto.randomUUID() }),
+    });
+    const alert = await res.json();
+    assert.equal(res.status, 201);
+
+    const viewer = await open({ shareToken: alert.tracking_url.split('/t/')[1] });
+    const staff = await open({ token: officer.token });
+    const phone = await open({ token: sosUser.token });
+
+    const toStaff = next(staff, 'alert:position');
+    const toViewer = next(viewer, 'alert:position');
+    const ack = await phone.emitWithAck('sos:location', {
+      alert_id: alert.alert_id,
+      sample: { lat: 5.3577, lng: 100.3033, recorded_at: deps.clock().toISOString(), battery_level: 31 },
+    });
+    assert.deepEqual(ack, { ok: true, accepted: 1, duplicates: 0, rejected: 0 });
+    assert.equal((await toStaff).alert_id, alert.alert_id);
+    assert.equal((await toViewer).lat, 5.3577);
+
+    // Someone else cannot stream into this SOS.
+    const intruder = await open({ token: student.token });
+    const denied = await intruder.emitWithAck('sos:location', {
+      alert_id: alert.alert_id,
+      sample: { lat: 5.3, lng: 100.3, recorded_at: deps.clock().toISOString() },
+    });
+    assert.deepEqual(denied, { ok: false, error: 'NOT_FOUND' });
+
+    const update = next(phone, 'alert:status');
+    await fetch(`${baseUrl}/api/staff/alerts/${alert.alert_id}/status`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${officer.token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'ON_THE_WAY' }),
+    });
+    const status = await update;
+    assert.equal(status.status, 'ON_THE_WAY');
+    assert.equal(status.latest.staff_name, 'Test Officer');
+  });
+
   it('disconnects a socket when its session token expires', async () => {
     const shortLived = await signToken({ sub: student.id, email: student.email, expiresInSeconds: 1 });
     const s = await open({ token: shortLived });

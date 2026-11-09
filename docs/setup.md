@@ -95,7 +95,33 @@ npm test
 cd apps/mobile && flutter test
 ```
 
-## 6. Demonstrating Module 1
+## 6. Put the safe points on the map (once)
+
+The 21 safe points supplied by the team are loaded by the migrations, but the
+list has no coordinates, so none are on the map yet. Sign in to the dashboard as
+security staff, open **Safe points**, select each point (filter "Needs
+location"), click its position on the map and press **Save**. Hours, phone
+numbers and notes can be corrected on the same form. The student app shows
+only points that are active and pinned.
+
+## 7. Demonstrating Module 2
+
+1. In the app, open **SOS** and hold the button for 3 seconds (or turn on
+   **Silent SOS** first). A quick tap does nothing.
+2. The dashboard's **Live emergencies** shows the SOS with an alarm (enable sound
+   once per session). Press **Received alert**, **On the way** (with a note),
+   **Arrived at location**, **Resolved**; the phone and the contact's live link
+   update immediately.
+3. The trusted contact receives the live link (SMS / Telegram / email when
+   configured; otherwise use **Share live location link** in the app).
+4. **Safe points** in the app lists the nearest places that are open now, ranked
+   by walking time, with call and directions.
+5. **I'm safe now** stops location sharing; security still resolves the alert.
+
+The emergency call buttons use `+604-653 4999` (USM Security) and `999`.
+Change them with `--dart-define=USM_SECURITY_EMERGENCY=+60...` if needed.
+
+## 8. Demonstrating Module 1
 
 For a demo without a long walk, set `DEV_ETA_OVERRIDE_SECONDS=60` in
 `apps/server/.env` (ignored in production) and restart the server.

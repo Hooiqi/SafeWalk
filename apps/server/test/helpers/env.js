@@ -46,17 +46,50 @@ export function testClock(start = new Date('2026-11-06T12:00:00Z')) {
   return clock;
 }
 
-/** Fake OSRM: a straight 2-point route of `distance` m walked at 1.25 m/s. */
-export function fakeOsrmFetch({ fail = false, distance = 600 } = {}) {
+/**
+ * Fake OSRM.
+ * - route: a straight 2-point route of `distance` m walked at 1.25 m/s, with two steps.
+ * - table: walking seconds from `tableDuration(dest)` (default: straight line at 1.25 m/s).
+ */
+export function fakeOsrmFetch({ fail = false, distance = 600, tableDuration } = {}) {
   const calls = [];
+  const straight = (a, b) => {
+    const dLat = (b[1] - a[1]) * 111_320;
+    const dLng = (b[0] - a[0]) * 111_320 * Math.cos((a[1] * Math.PI) / 180);
+    return Math.hypot(dLat, dLng);
+  };
   const fetchImpl = async (url) => {
     calls.push(url);
     if (fail) throw new Error('network down');
-    const [, coords] = /\/route\/v1\/[^/]+\/([^?]+)/.exec(url);
+    const [, service, coords] = /\/(route|table)\/v1\/[^/]+\/([^?]+)/.exec(url);
     const coordinates = coords.split(';').map((p) => p.split(',').map(Number));
+    if (service === 'table') {
+      const [origin, ...dests] = coordinates;
+      const distances = [0, ...dests.map((d) => straight(origin, d))];
+      const durations = [0, ...dests.map((d, i) => (tableDuration ? tableDuration({ lng: d[0], lat: d[1] }) : distances[i + 1] / 1.25))];
+      return { ok: true, json: async () => ({ code: 'Ok', durations: [durations], distances: [distances] }) };
+    }
     return {
       ok: true,
-      json: async () => ({ code: 'Ok', routes: [{ distance, duration: distance / 1.25, geometry: { type: 'LineString', coordinates } }] }),
+      json: async () => ({
+        code: 'Ok',
+        routes: [
+          {
+            distance,
+            duration: distance / 1.25,
+            geometry: { type: 'LineString', coordinates },
+            legs: [
+              {
+                steps: [
+                  { maneuver: { type: 'depart' }, name: 'Persiaran Sample', distance: distance - 50 },
+                  { maneuver: { type: 'turn', modifier: 'left' }, name: 'Jalan Sample', distance: 50 },
+                  { maneuver: { type: 'arrive' }, name: '', distance: 0 },
+                ],
+              },
+            ],
+          },
+        ],
+      }),
     };
   };
   fetchImpl.calls = calls;

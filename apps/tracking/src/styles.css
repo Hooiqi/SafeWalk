@@ -120,3 +120,9 @@
   .panel--danger { border-top: none; box-shadow: inset 3px 0 0 var(--sw-primary); }
   .panel--warning { border-top: none; box-shadow: inset 3px 0 0 var(--sw-secondary); }
 }
+
+.notice--danger {
+  border-color: rgba(255, 107, 129, 0.5);
+  background: var(--sw-primary-soft);
+}
+.panel--done { border-top: 1px solid var(--sw-border); }

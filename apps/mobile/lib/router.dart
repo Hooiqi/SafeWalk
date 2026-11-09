@@ -11,6 +11,8 @@ import 'features/home/home_screen.dart';
 import 'features/journey/active_journey_screen.dart';
 import 'features/journey/start_journey_screen.dart';
 import 'features/profile/profile_screen.dart';
+import 'features/safe_points/safe_points_screen.dart';
+import 'features/sos/sos_screen.dart';
 import 'features/shell/app_shell.dart';
 import 'services/auth_service.dart';
 
@@ -33,12 +35,14 @@ GoRouter buildRouter(AuthService auth) => GoRouter(
         GoRoute(path: '/journey/start', builder: (_, _) => const StartJourneyScreen()),
         GoRoute(path: '/contacts/new', builder: (_, _) => const ContactFormScreen()),
         GoRoute(path: '/contacts/edit', builder: (_, state) => ContactFormScreen(contact: state.extra as TrustedContact?)),
+        GoRoute(path: '/history', builder: (_, _) => const HistoryScreen()),
         StatefulShellRoute.indexedStack(
           builder: (_, _, shell) => AppShell(shell: shell),
           branches: [
             StatefulShellBranch(routes: [GoRoute(path: '/', builder: (_, _) => const HomeScreen())]),
+            StatefulShellBranch(routes: [GoRoute(path: '/safe-points', builder: (_, _) => const SafePointsScreen())]),
+            StatefulShellBranch(routes: [GoRoute(path: '/sos', builder: (_, _) => const SosScreen())]),
             StatefulShellBranch(routes: [GoRoute(path: '/contacts', builder: (_, _) => const ContactsScreen())]),
-            StatefulShellBranch(routes: [GoRoute(path: '/history', builder: (_, _) => const HistoryScreen())]),
             StatefulShellBranch(routes: [GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen())]),
           ],
         ),

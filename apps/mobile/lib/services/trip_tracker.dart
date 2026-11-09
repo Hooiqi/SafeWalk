@@ -153,7 +153,7 @@ class TripTracker extends ChangeNotifier {
     final heartbeat = event == SocketEvents.tripHeartbeat;
     final sample = _sample(fix, recordedAt, heartbeat: heartbeat);
     final socketSample = Map<String, dynamic>.from(sample)..remove('is_heartbeat');
-    final error = await realtime.sendSample(event, trip.id, socketSample);
+    final error = await realtime.send(event, {'trip_id': trip.id, 'sample': socketSample});
     if (error == null) return;
     if (error == 'TRIP_NOT_ACTIVE') {
       await _refreshFromServer();

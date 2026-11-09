@@ -8,6 +8,9 @@ import { createTelegramChannel } from './modules/notifications/channels/telegram
 import { createDispatcher } from './modules/notifications/dispatcher.js';
 import { createRoutingService } from './modules/routing/osrmClient.js';
 import { createTrackingService } from './modules/tracking/trackingService.js';
+import { createSafePointService } from './modules/safePoints/safePointService.js';
+import { createSosService } from './modules/sos/sosService.js';
+import { createAlertStatusService } from './modules/alerts/alertStatusService.js';
 import { createTripService } from './modules/trips/tripService.js';
 import { createEtaWatchdog } from './modules/watchdog/etaWatchdog.js';
 import { createPublisher } from './realtime/publisher.js';
@@ -36,10 +39,13 @@ export async function createContainer(config, overrides = {}) {
   const tripService = createTripService(base);
   const trackingService = createTrackingService(base);
   const watchdog = createEtaWatchdog({ ...base, tripService });
+  const safePointService = createSafePointService(base);
+  const sosService = createSosService(base);
+  const alertStatusService = createAlertStatusService({ ...base, tripService });
 
   for (const c of channels) {
     if (!c.configured) logger.info(`notification channel "${c.name}" not configured: deliveries will be reported as skipped`);
   }
 
-  return { ...base, tripService, trackingService, watchdog };
+  return { ...base, tripService, trackingService, watchdog, safePointService, sosService, alertStatusService };
 }

@@ -14,6 +14,10 @@ export default function Sidebar({ staff, onSignOut, openCount }) {
           <span>Live emergencies</span>
           {openCount > 0 && <span className="nav-item__count sw-num" aria-label={`${openCount} open`}>{openCount}</span>}
         </NavLink>
+        <p className="sidebar__section">Campus resources</p>
+        <NavLink to="/safe-points" className="nav-item">
+          <span>Safe points</span>
+        </NavLink>
       </nav>
 
       <div className="sidebar__footer">

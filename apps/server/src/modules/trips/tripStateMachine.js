@@ -10,6 +10,7 @@ import { TRIP_STATUS as S, TRIP_END_REASON as R } from '@safewalk/shared';
  *   ACTIVE | GRACE_PROMPT  --ARRIVE-->       COMPLETED  (arrived safely)
  *   GRACE_PROMPT | ESCALATED --CONFIRM_SAFE--> COMPLETED (user says they are safe)
  *   ACTIVE                 --CANCEL-->       CANCELLED
+ *   ESCALATED   --SECURITY_RESOLVED (staff)--> COMPLETED
  *
  * The machine only decides WHICH transition is legal and what it changes.
  * The trip service applies it with a conditional UPDATE
@@ -23,6 +24,7 @@ export const TRIP_EVENTS = Object.freeze({
   ARRIVE: 'ARRIVE',
   CONFIRM_SAFE: 'CONFIRM_SAFE',
   CANCEL: 'CANCEL',
+  SECURITY_RESOLVED: 'SECURITY_RESOLVED',
 });
 
 export const TRANSITIONS = Object.freeze({
@@ -36,6 +38,8 @@ export const TRANSITIONS = Object.freeze({
   // Cancelling is only allowed before the ETA passes; afterwards the user
   // must answer the check-in instead, so a cancel cannot silence an alert.
   CANCEL: { from: [S.ACTIVE], to: S.CANCELLED, endReason: R.CANCELLED },
+  // Raised when security staff resolve the trip's overdue alert (Module 4)
+  SECURITY_RESOLVED: { from: [S.ESCALATED], to: S.COMPLETED, endReason: R.RESOLVED_BY_SECURITY },
 });
 
 export const isTerminal = (status) => status === S.COMPLETED || status === S.CANCELLED;

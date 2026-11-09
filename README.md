@@ -5,8 +5,10 @@ Project, Group 12). Students and staff share a live walk with trusted
 contacts; a server-side watchdog alerts those contacts and the USM Security
 Department if they do not arrive and do not respond.
 
-> **Status (6 Nov 2026):** project setup and **Module 1 (Live Trip Sharing and
-> ETA Monitoring)** are implemented and tested. Modules 2 to 4 follow the
+> **Status (7 Nov 2026):** **Module 1 (Live Trip Sharing and ETA Monitoring)**
+> and **Module 2 (Emergency SOS and Safe Point Navigator)** are implemented and
+> tested, together with the security response workflow and safe point
+> management from Module 4. Module 3 and the rest of Module 4 follow the
 > proposal's sprint plan. See [docs/PLAN.md](docs/PLAN.md) for the full
 > requirements traceability matrix.
 
@@ -15,9 +17,9 @@ Department if they do not arrive and do not respond.
 | Module | State |
 |---|---|
 | M1 Live trip sharing and ETA monitoring | Implemented |
-| M2 Emergency SOS and safe point navigator | Planned (alert tables ready) |
+| M2 Emergency SOS and safe point navigator | Implemented |
 | M3 Incident reporting and safety map | Planned |
-| M4 Admin centralised security dashboard | Staff login and live overdue-alert view implemented; rest planned |
+| M4 Admin centralised security dashboard | Staff login, live alerts with response workflow, safe point management implemented; reports, announcements, analytics planned |
 
 ## Architecture (proposal 5.2.1, four tiers)
 
@@ -84,6 +86,16 @@ npm run dev:server
 - The default OSRM server is a fair-use public service; production use needs a
   self-hosted OSRM with the foot profile.
 - Checking known hazards before a walk depends on the Module 3 safety map.
+
+## Known limitations (Module 2)
+
+- The 21 safe points have no coordinates until security staff pin them in the dashboard.
+- Call buttons open the phone dialer with the number filled in; the phone asks the
+  user to confirm the call (Android and iOS do not allow apps to call silently).
+- Public-holiday and semester-break hours are shown as notes, not applied
+  automatically by the "open now" filter.
+- On Android a location notification is always visible while sharing (also during
+  a silent SOS); its wording is neutral ("Location sharing is on").
 
 ## Rules in one line
 
