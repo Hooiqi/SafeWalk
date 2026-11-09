@@ -24,3 +24,6 @@ supabase/.branches/
 # Hallmark design-lint working files
 .hallmark/
 .data/
+
+# Supabase Studio saved SQL (may contain staff emails)
+supabase/snippets/

@@ -79,7 +79,9 @@ body { font-variant-numeric: tabular-nums; }
 
 /* Leaflet in Dusk: OpenStreetMap tiles darkened, controls on slate glass. */
 .sw-dark-tiles { filter: invert(1) hue-rotate(180deg) brightness(0.88) contrast(0.9) saturate(0.4); }
-.leaflet-container { background: var(--color-paper-2); font-family: var(--font-body); }
+/* isolation keeps Leaflet's panes (z-index 200-700) inside the map, so panels,
+   sticky bars and dialogs on the page stay above it. */
+.leaflet-container { isolation: isolate; background: var(--color-paper-2); font-family: var(--font-body); }
 .leaflet-control-attribution { background: color-mix(in oklab, var(--color-paper) 82%, transparent) !important; color: var(--color-muted) !important; }
 .leaflet-control-attribution a { color: var(--color-ink-2) !important; }
 .leaflet-bar { border: 0 !important; box-shadow: var(--glass-hi) !important; border-radius: var(--radius-inner) !important; overflow: hidden; }
