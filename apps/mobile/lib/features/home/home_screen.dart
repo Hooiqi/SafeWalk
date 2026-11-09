@@ -126,6 +126,17 @@ class _HomeScreenState extends State<HomeScreen> {
             Card(
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                leading: const Icon(Icons.fact_check_outlined, color: SwColors.text2),
+                title: const Text('My reports'),
+                subtitle: Text('Follow what security did with your reports', style: text.bodySmall),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push('/incidents/mine'),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 leading: const Icon(Icons.shield_outlined, color: SwColors.text2),
                 title: const Text('Nearest safe point'),
                 subtitle: Text('Security posts, colleges and 24-hour places that are open now', style: text.bodySmall),

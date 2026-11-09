@@ -1,14 +1,14 @@
 import { LogOut } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 /** The dashboard shell: one top bar. Five short destinations still fit one row on a desktop. */
 export default function TopBar({ staff, onSignOut, openCount, pendingReports = 0, liveAnnouncements = 0 }) {
   return (
     <header className="topbar">
       <div className="topbar__inner">
-        <a className="wordmark" href="/emergencies">
+        <Link className="wordmark" to="/emergencies">
           SafeWalk <span className="topbar__product">Security</span>
-        </a>
+        </Link>
         <nav aria-label="Dashboard" className="topbar__nav">
           <NavLink to="/emergencies" className="topbar__link">
             Live emergencies

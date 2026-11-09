@@ -77,6 +77,7 @@ npm run dev:server
 |---|---|
 | [docs/PLAN.md](docs/PLAN.md) | Stages, traceability matrix, ambiguities, external dependencies, checklist |
 | [docs/setup.md](docs/setup.md) | Install, environment variables, running, tests, module demos |
+| [docs/deploy.md](docs/deploy.md) | Putting it online: Supabase, Render, Netlify (one website) |
 | [docs/database.md](docs/database.md) | ERD mapping, additions, constraints, RLS |
 | [docs/api.md](docs/api.md) | REST endpoints and Socket.io events |
 | [docs/design.md](docs/design.md) | Dusk theme, tokens and UI conventions |

@@ -15,7 +15,8 @@
     "dev:dashboard": "npm run dev -w @safewalk/dashboard",
     "test": "npm test -w @safewalk/server",
     "build": "npm run build -w @safewalk/tracking && npm run build -w @safewalk/dashboard && npm run build -w @safewalk/landing",
-    "dev:landing": "npm run dev -w @safewalk/landing"
+    "dev:landing": "npm run dev -w @safewalk/landing",
+    "build:site": "node scripts/build-site.mjs"
   },
   "engines": {
     "node": ">=20"

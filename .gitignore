@@ -27,3 +27,7 @@ supabase/.branches/
 
 # Supabase Studio saved SQL (may contain staff emails)
 supabase/snippets/
+
+# Website build (scripts/build-site.mjs) and its local settings
+site/
+deploy/site.json

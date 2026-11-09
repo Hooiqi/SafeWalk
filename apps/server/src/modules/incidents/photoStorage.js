@@ -103,9 +103,12 @@ export function cleanPhoto(buffer) {
 export function createPhotoStorage(config, { fetchImpl = fetch } = {}) {
   if (config.SUPABASE_URL && config.SUPABASE_SERVICE_ROLE_KEY) {
     const base = `${config.SUPABASE_URL.replace(/\/$/, '')}/storage/v1/object/${PHOTO_BUCKET}`;
+    // Legacy service_role keys are JWTs and also go in Authorization; the new
+    // secret keys (sb_secret_...) are accepted only in the apikey header.
+    const key = config.SUPABASE_SERVICE_ROLE_KEY;
     const headers = {
-      Authorization: `Bearer ${config.SUPABASE_SERVICE_ROLE_KEY}`,
-      apikey: config.SUPABASE_SERVICE_ROLE_KEY,
+      ...(key.startsWith('eyJ') ? { Authorization: `Bearer ${key}` } : {}),
+      apikey: key,
     };
     return {
       configured: true,

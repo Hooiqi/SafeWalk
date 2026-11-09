@@ -1,0 +1,43 @@
+# Render Blueprint for the SafeWalk Node server (REST + Socket.io + ETA watchdog).
+# Render > New > Blueprint > pick this repository and branch. Values marked
+# "sync: false" are asked for once in the Render dashboard; never commit them.
+services:
+  - type: web
+    name: safewalk-server
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci
+    startCommand: npm start -w @safewalk/server
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      # Supabase > Connect > Session pooler (port 5432). Render has no IPv6, so
+      # the "Direct connection" string does not work here.
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_SSL
+        value: "true"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      # The website address, e.g. https://safewalk-usm.netlify.app
+      - key: CORS_ORIGINS
+        sync: false
+      # The website address + /t/ , e.g. https://safewalk-usm.netlify.app/t/
+      - key: TRACKING_PAGE_URL
+        sync: false
+      - key: ALLOWED_USER_EMAIL_DOMAINS
+        value: ""
+      - key: GRACE_PERIOD_SECONDS
+        value: "180"
+      - key: PHOTO_STORAGE_DIR
+        value: ""
+      # Optional channels, add later: TWILIO_*, TELEGRAM_BOT_TOKEN, SMTP_URL,
+      # SMTP_FROM, FIREBASE_SERVICE_ACCOUNT_JSON.

@@ -1,0 +1,10 @@
+{
+  "API_URL": "https://YOUR-SERVER.onrender.com",
+  "SUPABASE_URL": "https://YOUR-PROJECT-REF.supabase.co",
+  "SUPABASE_ANON_KEY": "sb_publishable_... (the PUBLISHABLE key, never the secret one)",
+  "TILE_URL": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "FIREBASE_API_KEY": "",
+  "FIREBASE_APP_ID": "",
+  "FIREBASE_SENDER_ID": "",
+  "FIREBASE_PROJECT_ID": ""
+}
