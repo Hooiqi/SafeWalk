@@ -26,23 +26,26 @@ export const ACTION_LABEL = {
 export const CATEGORY_LABEL = {
   SECURITY_POST: 'Security post',
   MEDICAL: 'Medical',
-  STUDY_AREA: 'Study area / library',
+  STUDY_AREA: 'Study area or library',
   RESIDENTIAL_COLLEGE: 'Residential college',
   PUBLIC_BUILDING: 'Public building',
   POLICE_STATION: 'Police station',
 };
 
+/** Dusk signals: periwinkle for handled or safe, apricot for open or waiting. */
+export const statusTone = (status) => (status === 'NEW' ? 'open' : 'done');
+
 /** One-line situation summary for an alert. */
 export function alertStateNote(alert) {
   if (alert.status === 'RESOLVED') return { tone: 'done', text: `Resolved at ${formatTime(alert.resolved_at)}` };
-  if (alert.user_safe_at) return { tone: 'done', text: `User marked themselves safe at ${formatTime(alert.user_safe_at)}` };
+  if (alert.user_safe_at) return { tone: 'done', text: `Marked themselves safe at ${formatTime(alert.user_safe_at)}` };
   const trip = alert.trip;
   if (alert.trigger_type === 'ETA' && trip) {
-    if (trip.status === 'COMPLETED' && trip.end_reason === 'SAFE_CONFIRMED') return { tone: 'done', text: 'User has since confirmed they are safe' };
-    if (trip.status === 'COMPLETED') return { tone: 'done', text: 'Journey has ended' };
-    if (trip.signal_lost_at) return { tone: 'warning', text: 'No signal from phone' };
-    return { tone: 'danger', text: 'No check-in from user' };
+    if (trip.status === 'COMPLETED' && trip.end_reason === 'SAFE_CONFIRMED') return { tone: 'done', text: 'Has since confirmed they are safe' };
+    if (trip.status === 'COMPLETED') return { tone: 'done', text: 'The journey has ended' };
+    if (trip.signal_lost_at) return { tone: 'open', text: 'No signal from the phone' };
+    return { tone: 'open', text: 'No check-in after the arrival time' };
   }
-  if (alert.trigger_type === 'SILENT') return { tone: 'danger', text: 'Silent SOS: the person may not be able to talk' };
-  return { tone: 'danger', text: 'SOS raised by the user' };
+  if (alert.trigger_type === 'SILENT') return { tone: 'open', text: 'Silent SOS: may not be able to talk' };
+  return { tone: 'open', text: 'SOS raised by the person' };
 }

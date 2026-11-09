@@ -31,3 +31,20 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Wix Madefor (SIL Open Font License, assets/fonts/OFL.txt): the Dusk theme's faces.
+  fonts:
+    - family: WixMadeforDisplay
+      fonts:
+        - asset: assets/fonts/WixMadeforDisplay-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/WixMadeforDisplay-SemiBold.ttf
+          weight: 600
+    - family: WixMadeforText
+      fonts:
+        - asset: assets/fonts/WixMadeforText-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/WixMadeforText-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/WixMadeforText-SemiBold.ttf
+          weight: 600

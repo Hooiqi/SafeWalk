@@ -11,6 +11,9 @@ Department if they do not arrive and do not respond.
 > management from Module 4. Module 3 and the rest of Module 4 follow the
 > proposal's sprint plan. See [docs/PLAN.md](docs/PLAN.md) for the full
 > requirements traceability matrix.
+>
+> **UI (9 Nov 2026):** every surface now uses the Hallmark **Dusk** theme, and a
+> public landing page (`apps/landing`) was added. See [docs/design.md](docs/design.md).
 
 ## Modules (proposal 5.1)
 
@@ -40,6 +43,7 @@ apps/
   mobile/      Flutter app for students and staff
   tracking/    React page for trusted contacts (no login, secure link)
   dashboard/   React dashboard for USM Security staff
+  landing/     Public landing page (static, Vite)
 packages/
   shared/      JS constants and web design tokens shared by the apps
 supabase/
@@ -74,7 +78,7 @@ npm run dev:server
 | [docs/setup.md](docs/setup.md) | Install, environment variables, running, tests, Module 1 demo |
 | [docs/database.md](docs/database.md) | ERD mapping, additions, constraints, RLS |
 | [docs/api.md](docs/api.md) | REST endpoints and Socket.io events |
-| [docs/design.md](docs/design.md) | Palette and UI conventions |
+| [docs/design.md](docs/design.md) | Dusk theme, tokens and UI conventions |
 | [docs/04-team-workflow.md](docs/04-team-workflow.md) | Git rules |
 
 ## Known limitations (Module 1)

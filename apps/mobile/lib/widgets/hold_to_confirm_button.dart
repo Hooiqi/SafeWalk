@@ -70,7 +70,7 @@ class _HoldToConfirmButtonState extends State<HoldToConfirmButton> with SingleTi
 
   @override
   Widget build(BuildContext context) {
-    final colour = widget.enabled ? SwColors.primary : SwColors.surfaceRaised;
+    final colour = widget.enabled ? SwColors.alert : SwColors.surfaceRaised;
     return Semantics(
       button: true,
       enabled: widget.enabled,
@@ -90,7 +90,7 @@ class _HoldToConfirmButtonState extends State<HoldToConfirmButton> with SingleTi
                   child: CircularProgressIndicator(
                     value: _progress.value,
                     strokeWidth: 8,
-                    color: SwColors.secondary,
+                    color: SwColors.text,
                     backgroundColor: SwColors.border,
                   ),
                 ),
@@ -101,7 +101,7 @@ class _HoldToConfirmButtonState extends State<HoldToConfirmButton> with SingleTi
                   alignment: Alignment.center,
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     Text(widget.label,
-                        style: const TextStyle(color: SwColors.onAccent, fontSize: 44, fontWeight: FontWeight.w800, letterSpacing: 2)),
+                        style: const TextStyle(color: SwColors.onAccent, fontFamily: 'WixMadeforDisplay', fontSize: 44, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 4),
                     Text(
                       _progress.value > 0 ? 'Keep holding… $remaining' : widget.hint,

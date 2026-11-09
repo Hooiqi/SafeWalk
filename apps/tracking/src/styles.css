@@ -1,128 +1,42 @@
-.brand {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: var(--sw-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Dusk (by request) · redesign: full
+ * nav: none, the wordmark inside the panel · signature: the live map with the status in smoked glass over it · states: loading, error, expired, not found, full · dusk: none/periwinkle-apricot/glass
+ * axes: dark/grotesk-sans/cool · posture: committed · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H5 E4 S5 R5 V4 · weakest: E, glass over a live map needs a legible panel; the panel keeps the Dusk glass recipe with its lit edge and a solid fallback without backdrop-filter */
+
+/* Phone first: the map on top, the panel below on slate. */
+.layout { display: grid; grid-template-rows: minmax(52dvh, 1fr) auto; min-height: 100dvh; }
+.map { min-height: 52dvh; height: 100%; }
+
+.panel { display: grid; gap: var(--space-sm); align-content: start; padding: var(--space-lg) var(--space-md) var(--space-xl); border-radius: var(--radius-card) var(--radius-card) 0 0; }
+.panel__header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); margin-bottom: var(--space-xs); }
+.panel__who { font-weight: 600; color: var(--color-ink); }
+.panel__title { font-size: var(--text-display); line-height: 1.12; text-wrap: balance; }
+.panel__detail { color: var(--color-ink-2); }
+
+.facts { display: grid; margin: var(--space-xs) 0 0; }
+.facts__row { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: var(--space-sm); padding: var(--space-xs) 0; border-top: var(--rule-hair) solid color-mix(in oklab, var(--color-light) 8%, transparent); }
+.facts dt { font-size: var(--text-sm); font-weight: 500; color: var(--color-muted); }
+.facts dd { margin: 0; font-weight: 500; }
+
+.strip { display: grid; justify-content: start; gap: var(--space-3xs); }
+.footnote { font-size: var(--text-sm); color: var(--color-muted); }
+
+/* Messages: expired, not found, failed */
+.message { display: grid; place-items: center; min-height: 100dvh; padding: var(--space-md); }
+.message__card { display: grid; gap: var(--space-sm); max-width: 440px; padding: var(--space-xl); }
+.message__card h1 { font-size: var(--text-display); text-wrap: balance; }
+.message__card code { font-size: var(--text-sm); }
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .panel { background: var(--color-paper-2); }
 }
 
-/* Mobile first: map on top, status sheet below. */
-.layout {
-  display: grid;
-  grid-template-rows: minmax(52vh, 1fr) auto;
-  min-height: 100%;
-}
-
-.map {
-  min-height: 52vh;
-  height: 100%;
-}
-
-.panel {
-  padding: var(--sw-space-5) var(--sw-space-4) var(--sw-space-6);
-  background: var(--sw-surface);
-  border-top: 1px solid var(--sw-border);
-}
-
-.panel--danger { border-top: 3px solid var(--sw-primary); }
-.panel--warning { border-top: 3px solid var(--sw-secondary); }
-
-.panel__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--sw-space-4);
-}
-
-.panel__who { margin: 0 0 var(--sw-space-3); }
-
-.panel__title {
-  margin: var(--sw-space-3) 0 var(--sw-space-2);
-  font-size: 22px;
-  line-height: 1.25;
-}
-
-.panel__detail { margin: 0; color: var(--sw-text-muted); }
-
-.live {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--sw-text-muted);
-}
-.live--live::before {
-  content: '';
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 6px;
-  border-radius: 50%;
-  background: var(--sw-secondary);
-}
-
-.notice {
-  margin: var(--sw-space-4) 0 0;
-  padding: var(--sw-space-3);
-  border: 1px solid rgba(255, 163, 114, 0.4);
-  border-radius: var(--sw-radius);
-  background: var(--sw-secondary-soft);
-  font-size: 14px;
-}
-
-.facts {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sw-space-3) var(--sw-space-4);
-  margin: var(--sw-space-5) 0 0;
-  padding-top: var(--sw-space-4);
-  border-top: 1px solid var(--sw-border);
-}
-.facts dt { font-size: 12px; color: var(--sw-text-muted); }
-.facts dd { margin: 2px 0 0; font-weight: 600; }
-
-.footnote {
-  margin: var(--sw-space-4) 0 0;
-  font-size: 12px;
-  color: var(--sw-text-muted);
-}
-
-.message {
-  display: grid;
-  place-items: center;
-  min-height: 100%;
-  padding: var(--sw-space-4);
-}
-.message__card {
-  max-width: 420px;
-  padding: var(--sw-space-5);
-  border: 1px solid var(--sw-border);
-  border-radius: var(--sw-radius-lg);
-  background: var(--sw-surface);
-}
-.message__card h1 { margin: var(--sw-space-3) 0 var(--sw-space-2); font-size: 20px; }
-.message__card p:last-child { margin: 0; }
-
-/* Desktop / tablet: side panel. */
-@media (min-width: 860px) {
-  .layout {
-    grid-template-columns: 1fr 380px;
-    grid-template-rows: 100vh;
-  }
-  .map { height: 100vh; }
+/* Tablet and desktop: the map fills the screen, the panel floats over it in glass. */
+@media (min-width: 60rem) {
+  .layout { display: block; position: relative; height: 100dvh; }
+  .map { position: absolute; inset: 0; height: 100%; }
   .panel {
-    overflow-y: auto;
-    border-top: none;
-    border-left: 1px solid var(--sw-border);
+    position: absolute; z-index: var(--z-raised); top: var(--space-lg); right: var(--space-lg);
+    width: min(400px, 40vw); max-height: calc(100dvh - 2 * var(--space-lg)); overflow-y: auto; padding: var(--space-xl) var(--space-lg); border-radius: var(--radius-card);
   }
-  .panel--danger { border-top: none; box-shadow: inset 3px 0 0 var(--sw-primary); }
-  .panel--warning { border-top: none; box-shadow: inset 3px 0 0 var(--sw-secondary); }
 }
-
-.notice--danger {
-  border-color: rgba(255, 107, 129, 0.5);
-  background: var(--sw-primary-soft);
-}
-.panel--done { border-top: 1px solid var(--sw-border); }

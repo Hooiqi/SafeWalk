@@ -155,6 +155,7 @@ every column added beyond the ERD.
 | A16 | ERD SAFE_POINT has one `name_and_category` column | Split into `name` + `category` so the app can filter and colour by category |
 | A17 | Should an SOS notify trusted contacts? Module 2 text mentions only security; 5.2.3 2B/2C say SOS alerts and live location go to configured channels and contacts | Contacts are notified and get a live link |
 | A18 | What closes an SOS: the user or security? | The user can mark themselves safe (sharing stops), but only security resolves the alert |
+| A19 | On 9 Nov 2026 the team replaced the mandatory "Dark mode: orange & pink" palette with a new UI requirement | Adopted the Hallmark "Dusk" theme for every surface (dashboard, tracking page, Flutter app, new landing site). See `docs/design.md`. Dusk has no red: emergencies use the apricot accent, always with an icon and words |
 
 ## 7. Completion checklist (proposal acceptance criteria)
 

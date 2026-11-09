@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import Sidebar from './components/Sidebar.jsx';
+import TopBar from './components/TopBar.jsx';
 import EmergenciesPage from './pages/EmergenciesPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import SafePointsPage from './pages/SafePointsPage.jsx';
@@ -12,7 +12,7 @@ function StaffShell({ auth }) {
   const open = emergencies.alerts.filter((a) => a.status !== 'RESOLVED').length;
   return (
     <div className="shell">
-      <Sidebar staff={auth.staff} onSignOut={auth.signOut} openCount={open} />
+      <TopBar staff={auth.staff} onSignOut={auth.signOut} openCount={open} />
       <main className="shell__main">
         <Routes>
           <Route path="/emergencies" element={<EmergenciesPage accessToken={auth.session.access_token} emergencies={emergencies} />} />
@@ -26,13 +26,13 @@ function StaffShell({ auth }) {
 
 function AuthGate() {
   const auth = useAuth();
-  if (auth.loading) return <p className="sw-muted state">Checking your session…</p>;
+  if (auth.loading) return <p className="muted state">Checking your session</p>;
   if (!auth.session) return <LoginPage notice={auth.notice} />;
   if (auth.staffError) {
     return (
-      <div className="state state--error">
+      <div className="state state--error" role="alert">
         <p>Could not verify staff access: {auth.staffError.message}</p>
-        <button type="button" className="sw-button" onClick={auth.signOut}>Sign out</button>
+        <button type="button" className="btn" onClick={auth.signOut}>Sign out</button>
       </div>
     );
   }
@@ -42,7 +42,7 @@ function AuthGate() {
 export default function App() {
   if (!supabaseConfigured) {
     return (
-      <p className="state state--error">
+      <p className="state state--error" role="alert">
         Supabase is not configured. Copy apps/dashboard/.env.example to .env and set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.
       </p>
     );

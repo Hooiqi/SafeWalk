@@ -5,7 +5,8 @@ import '../core/theme.dart';
 
 enum BadgeTone { neutral, warning, danger, done }
 
-/// Status label that always pairs colour with text (never colour alone).
+/// A status word with its icon (Dusk): sentence case, never colour alone.
+/// Periwinkle for done or safe, apricot for open or needing attention.
 class StatusBadge extends StatelessWidget {
   const StatusBadge(this.label, {super.key, this.tone = BadgeTone.neutral});
 
@@ -14,26 +15,16 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = switch (tone) {
-      BadgeTone.warning => SwColors.secondary,
-      BadgeTone.danger => SwColors.primary,
-      BadgeTone.done => SwColors.textMuted,
-      BadgeTone.neutral => SwColors.text,
+    final (Color color, IconData? icon) = switch (tone) {
+      BadgeTone.warning => (SwColors.alert, Icons.hourglass_bottom_rounded),
+      BadgeTone.danger => (SwColors.alert, Icons.sos_rounded),
+      BadgeTone.done => (SwColors.primary, Icons.check_circle_outline_rounded),
+      BadgeTone.neutral => (SwColors.text2, null),
     };
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: tone == BadgeTone.neutral || tone == BadgeTone.done ? null : color.withValues(alpha: 0.12),
-        border: Border.all(color: tone == BadgeTone.neutral || tone == BadgeTone.done ? SwColors.border : color.withValues(alpha: 0.45)),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Container(width: 7, height: 7, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        const SizedBox(width: 6),
-        Text(label.toUpperCase(),
-            style: TextStyle(color: color, fontSize: 11.5, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
-      ]),
-    );
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      if (icon != null) ...[Icon(icon, size: 16, color: color), const SizedBox(width: 6)],
+      Text(label, style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.w500)),
+    ]);
   }
 }
 
@@ -43,7 +34,7 @@ class StatusBadge extends StatelessWidget {
       TripStatus.gracePrompt => ('Check-in needed', BadgeTone.warning),
       TripStatus.escalated => ('Alert raised', BadgeTone.danger),
       TripStatus.completed => (endReason == 'ARRIVED' ? 'Arrived' : 'Confirmed safe', BadgeTone.done),
-      TripStatus.cancelled => ('Cancelled', BadgeTone.done),
+      TripStatus.cancelled => ('Cancelled', BadgeTone.neutral),
       _ => (status, BadgeTone.neutral),
     };
 
@@ -95,15 +86,14 @@ class EmptyView extends StatelessWidget {
 void showMessage(BuildContext context, String message) =>
     ScaffoldMessenger.of(context)..hideCurrentSnackBar()..showSnackBar(SnackBar(content: Text(message)));
 
-/// The "SAFEWALK" wordmark with the palette gradient.
+/// The SafeWalk wordmark: the product name in the display face, sentence case.
 class Wordmark extends StatelessWidget {
-  const Wordmark({super.key, this.size = 14});
+  const Wordmark({super.key, this.size = 18});
   final double size;
 
   @override
-  Widget build(BuildContext context) => ShaderMask(
-        shaderCallback: (rect) => SwColors.gradient.createShader(rect),
-        child: Text('SAFEWALK',
-            style: TextStyle(fontSize: size, fontWeight: FontWeight.w800, letterSpacing: size * 0.12, color: Colors.white)),
+  Widget build(BuildContext context) => Text(
+        'SafeWalk',
+        style: TextStyle(fontFamily: 'WixMadeforDisplay', fontSize: size, fontWeight: FontWeight.w600, letterSpacing: -0.3, color: SwColors.text),
       );
 }

@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SafeWalk, campus safety for USM</title>
+    <meta name="description" content="Share your walk across Universiti Sains Malaysia with people you trust. If you miss your arrival and stop answering, USM Security knows." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;500;600&family=Wix+Madefor+Text:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <header class="nav">
+      <div class="container nav__inner">
+        <a class="wordmark" href="/">SafeWalk</a>
+        <nav class="nav__actions" aria-label="Main">
+          <a class="nav__link" href="http://localhost:5174" data-link="dashboard">Security sign in</a>
+          <a class="btn btn--primary" href="http://localhost:8080" data-link="app">Open SafeWalk</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <picture class="hero__photo">
+          <source media="(max-width: 760px)" srcset="/photos/usm-dusk-960.webp" />
+          <img src="/photos/usm-dusk.webp" alt="The main entrance of Universiti Sains Malaysia in Penang at dusk, with the trails of passing cars" width="1920" height="1270" fetchpriority="high" />
+        </picture>
+        <div class="container hero__grid">
+          <div class="hero__text">
+            <h1 id="hero-title">Walk home. SafeWalk keeps watch.</h1>
+            <p class="lead">If you miss your arrival and stop answering, USM Security knows.</p>
+            <div class="hero__actions">
+              <a class="btn btn--primary btn--large" href="http://localhost:8080" data-link="app">Open SafeWalk</a>
+              <p class="hero__who">For USM students and staff.</p>
+            </div>
+          </div>
+
+          <figure class="run glass" aria-labelledby="run-caption">
+            <div class="run__head">
+              <span class="run__title">Walk to Desasiswa Tekun</span>
+              <span class="run__meta">8 min on foot</span>
+            </div>
+            <ol class="run__rows">
+              <li class="run__row">
+                <span class="run__time num">22:41</span>
+                <span class="run__what">Journey shared<span class="run__sub">Two contacts get a live link</span></span>
+                <span class="state state--done">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                  On the way
+                </span>
+              </li>
+              <li class="run__row">
+                <span class="run__time num">22:49</span>
+                <span class="run__what">Arrival time passed<span class="run__sub">The phone asks: are you safe?</span></span>
+                <span class="state state--open">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v6l4 2" /><circle cx="12" cy="12" r="9" /></svg>
+                  Waiting
+                </span>
+              </li>
+              <li class="run__row">
+                <span class="run__time num">22:52</span>
+                <span class="run__what">No answer in 3 minutes<span class="run__sub">Route and last position sent</span></span>
+                <span class="state state--open">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01" /><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /></svg>
+                  Alert raised
+                </span>
+              </li>
+            </ol>
+            <div class="run__open">
+              <span><strong>USM Security</strong> received it at 22:53</span>
+              <span class="run__open-state">On the way</span>
+            </div>
+            <figcaption id="run-caption" class="run__caption">An example walk. The countdown runs on SafeWalk’s server, so it keeps going if the phone dies.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="tour" aria-labelledby="tour-title">
+        <div class="container tour__grid">
+          <div class="tour__text">
+            <h2 id="tour-title">On your phone</h2>
+            <p class="lead">Four things, each a tap from the home screen.</p>
+            <ol class="tour__list" role="list">
+              <li>
+                <button type="button" class="tour__item" aria-pressed="true" data-shot="/screens/app-home.webp" data-alt="SafeWalk home screen with Start a tracked walk">Share a walk</button>
+                <p class="tour__line">Pick where you are going and who should follow.</p>
+              </li>
+              <li>
+                <button type="button" class="tour__item" aria-pressed="false" data-shot="/screens/app-sos.webp" data-alt="SOS screen with the hold button, silent mode and call buttons">Hold for SOS</button>
+                <p class="tour__line">Three seconds sends your position. Silent mode makes no sound.</p>
+              </li>
+              <li>
+                <button type="button" class="tour__item" aria-pressed="false" data-shot="/screens/app-sos-active.webp" data-alt="Active SOS with updates from USM Security">See security respond</button>
+                <p class="tour__line">Received, on the way, arrived: each step reaches your phone.</p>
+              </li>
+              <li>
+                <button type="button" class="tour__item" aria-pressed="false" data-shot="/screens/app-safe-points.webp" data-alt="Nearest safe points that are open now, with walking times">Find an open safe point</button>
+                <p class="tour__line">Only places open now, ranked by walking time.</p>
+              </li>
+            </ol>
+          </div>
+          <figure class="phone">
+            <img id="tour-shot" src="/screens/app-home.webp" alt="SafeWalk home screen with Start a tracked walk" width="600" height="1221" loading="lazy" />
+          </figure>
+        </div>
+      </section>
+
+      <section class="tally" aria-labelledby="tally-title">
+        <div class="container">
+          <div class="tally__head">
+            <h2 id="tally-title">Timed by the server</h2>
+            <p class="lead">A flat battery cannot stop the clock.</p>
+          </div>
+          <dl class="tally__grid">
+            <div class="tally__item">
+              <dt class="figure num">3<span class="unit">s</span></dt>
+              <dd>Hold SOS this long to send it.</dd>
+            </div>
+            <div class="tally__item">
+              <dt class="figure num">3<span class="unit">min</span></dt>
+              <dd>To answer a check-in before anyone is told.</dd>
+            </div>
+            <div class="tally__item">
+              <dt class="figure num">21</dt>
+              <dd>Safe points on the campus list.</dd>
+            </div>
+            <div class="tally__item">
+              <dt class="figure num">24<span class="unit">h</span></dt>
+              <dd>USM Security line, one tap from SOS.</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="handoff" aria-labelledby="handoff-title">
+        <div class="container handoff__grid">
+          <figure class="well">
+            <div class="well__card">
+              <p class="well__from">SafeWalk</p>
+              <p class="well__text">URGENT: your friend did not arrive at Desasiswa Tekun on time and did not respond to the SafeWalk check-in. USM Security has been alerted. Route history and live position: safewalk link</p>
+            </div>
+            <figcaption><strong>The message a contact receives</strong>by SMS, Telegram or email</figcaption>
+          </figure>
+          <div class="handoff__text">
+            <h2 id="handoff-title">Your people need no app</h2>
+            <p class="lead">One link, any browser. They watch you walk until you arrive.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="desk" aria-labelledby="desk-title">
+        <div class="container">
+          <div class="desk__head">
+            <h2 id="desk-title">Security sees it at once</h2>
+            <p class="lead">Every SOS and missed arrival lands in one queue, with an alarm.</p>
+          </div>
+          <figure class="desk__shot glass">
+            <img src="/screens/dashboard.webp" alt="The SafeWalk security dashboard: a queue of open alerts beside the selected person's details, map and response buttons" width="1600" height="1000" loading="lazy" />
+          </figure>
+        </div>
+      </section>
+
+      <section class="night" aria-labelledby="night-title">
+        <div class="container">
+          <div class="night__head">
+            <h2 id="night-title">Open all night</h2>
+            <p class="lead">Staffed places on the campus list, open 24 hours.</p>
+          </div>
+          <table class="night__table">
+            <caption class="visually-hidden">Safe points open 24 hours</caption>
+            <thead>
+              <tr>
+                <th scope="col">Place</th>
+                <th scope="col">Where</th>
+                <th scope="col">Phone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Jabatan Keselamatan HQ</td>
+                <td>Bangunan L21</td>
+                <td class="num"><a href="tel:+6046534999">+604-653 4999</a></td>
+              </tr>
+              <tr>
+                <td>Pintu Kawalan Stadium</td>
+                <td>Main stadium entrance</td>
+                <td class="num"><a href="tel:+6046534333">+604-653 4333</a></td>
+              </tr>
+              <tr>
+                <td>Pintu Kawalan RST</td>
+                <td>Kompleks RST entrance</td>
+                <td class="num"><a href="tel:+6046534333">+604-653 4333</a></td>
+              </tr>
+              <tr>
+                <td>24-Hour Reading Foyer</td>
+                <td>Between PHS and PHS 1</td>
+                <td class="num"><a href="tel:+6046533720">+604-653 3720</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="night__note">Every residential college compound is staffed by wardens after hours.</p>
+        </div>
+      </section>
+
+      <section class="close" aria-labelledby="close-title">
+        <div class="container close__grid">
+          <div class="close__text">
+            <h2 id="close-title">Set it up before tonight</h2>
+            <p class="lead">Add the people you trust, then share your next walk.</p>
+            <div class="close__actions">
+              <a class="btn btn--primary btn--large" href="http://localhost:8080" data-link="app">Open SafeWalk</a>
+              <a class="btn btn--ghost btn--large" href="http://localhost:5174" data-link="dashboard">Security sign in</a>
+            </div>
+          </div>
+          <figure class="phone phone--small">
+            <img src="/screens/app-sos.webp" alt="The SafeWalk SOS screen" width="600" height="1221" loading="lazy" />
+          </figure>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <p class="footer__mark">SafeWalk</p>
+        <p class="footer__colophon">
+          A CAT304 student project by Group 12, School of Computer Sciences, Universiti Sains Malaysia. It is not an official USM Security service. In an emergency call
+          <a href="tel:+6046534999">+604-653 4999</a> or <a href="tel:999">999</a>.
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

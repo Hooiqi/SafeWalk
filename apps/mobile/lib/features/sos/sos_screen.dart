@@ -67,7 +67,7 @@ class _CallButtons extends StatelessWidget {
       const SizedBox(height: 10),
       OutlinedButton.icon(
         onPressed: () => onCall(nationalEmergencyNumber),
-        icon: const Icon(Icons.local_police_outlined, color: SwColors.secondary),
+        icon: const Icon(Icons.local_police_outlined, color: SwColors.primary),
         label: const Text('Call $nationalEmergencyNumber (national emergency)'),
       ),
     ]);
@@ -105,8 +105,7 @@ class _ReadyView extends StatelessWidget {
         child: SwitchListTile(
           value: silent,
           onChanged: onSilentChanged,
-          activeThumbColor: SwColors.primary,
-          title: const Text('Silent SOS', style: TextStyle(fontWeight: FontWeight.w600)),
+                    title: const Text('Silent SOS', style: TextStyle(fontWeight: FontWeight.w600)),
           subtitle: Text(
             'No vibration and no call. Use it when you cannot speak or need to stay hidden.',
             style: text.bodySmall,
@@ -115,7 +114,7 @@ class _ReadyView extends StatelessWidget {
       ),
       if (error != null) ...[
         const SizedBox(height: 12),
-        Text(error!, style: const TextStyle(color: SwColors.primary)),
+        Text(error!, style: const TextStyle(color: SwColors.error)),
       ],
       const SizedBox(height: 24),
       Text('Call for help', style: text.titleSmall),
@@ -212,7 +211,7 @@ class _ActiveViewState extends State<_ActiveView> {
 
     return ListView(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), children: [
       Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: SwColors.primary, width: 2)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(SwRadius.card), side: const BorderSide(color: SwColors.alert, width: 2)),
         child: Padding(
           padding: const EdgeInsets.all(18),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -224,7 +223,7 @@ class _ActiveViewState extends State<_ActiveView> {
             const SizedBox(height: 14),
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Icon(c.gpsProblem == null && c.isConnected ? Icons.my_location_rounded : Icons.location_searching_rounded,
-                  size: 18, color: SwColors.secondary),
+                  size: 18, color: SwColors.primary),
               const SizedBox(width: 10),
               Expanded(child: Text(sharing)),
             ]),

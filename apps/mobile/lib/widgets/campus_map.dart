@@ -52,7 +52,7 @@ class CampusMap extends StatelessWidget {
         ),
         if (route.length > 1)
           PolylineLayer(polylines: [
-            Polyline(points: route, color: SwColors.secondary, strokeWidth: 5),
+            Polyline(points: route, color: SwColors.primary, strokeWidth: 5),
           ]),
         MarkerLayer(markers: [
           ...markers,
@@ -87,9 +87,9 @@ class _MyPositionDot extends StatelessWidget {
         label: 'Your location',
         child: Container(
           decoration: BoxDecoration(
-            color: SwColors.primary,
+            color: SwColors.alert,
             shape: BoxShape.circle,
-            border: Border.all(color: SwColors.text, width: 3),
+            border: Border.all(color: SwColors.background, width: 3),
           ),
         ),
       );

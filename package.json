@@ -6,6 +6,7 @@
     "packages/shared",
     "apps/server",
     "apps/tracking",
+    "apps/landing",
     "apps/dashboard"
   ],
   "scripts": {
@@ -13,7 +14,8 @@
     "dev:tracking": "npm run dev -w @safewalk/tracking",
     "dev:dashboard": "npm run dev -w @safewalk/dashboard",
     "test": "npm test -w @safewalk/server",
-    "build": "npm run build -w @safewalk/tracking && npm run build -w @safewalk/dashboard"
+    "build": "npm run build -w @safewalk/tracking && npm run build -w @safewalk/dashboard && npm run build -w @safewalk/landing",
+    "dev:landing": "npm run dev -w @safewalk/landing"
   },
   "engines": {
     "node": ">=20"

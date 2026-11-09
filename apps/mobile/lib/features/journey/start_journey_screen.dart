@@ -200,14 +200,14 @@ class _MapHint extends StatelessWidget {
   Widget build(BuildContext context) => Material(
         color: SwColors.surface.withValues(alpha: 0.94),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: BorderSide(color: isError ? SwColors.primary : SwColors.border),
+          borderRadius: BorderRadius.circular(SwRadius.inner),
+          side: BorderSide(color: isError ? SwColors.error : SwColors.border),
         ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(14, 6, 6, 6),
           child: Row(children: [
             Icon(isError ? Icons.location_off_outlined : Icons.touch_app_outlined,
-                size: 18, color: isError ? SwColors.primary : SwColors.textMuted),
+                size: 18, color: isError ? SwColors.error : SwColors.textMuted),
             const SizedBox(width: 10),
             Expanded(child: Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text(text))),
             ?action,
@@ -266,7 +266,7 @@ class _JourneySheet extends StatelessWidget {
             ])
           else if (routeError != null)
             Row(children: [
-              Expanded(child: Text(routeError!, style: const TextStyle(color: SwColors.primary))),
+              Expanded(child: Text(routeError!, style: const TextStyle(color: SwColors.error))),
               TextButton(onPressed: onRetryRoute, child: const Text('Retry')),
             ])
           else if (preview != null) ...[
@@ -296,7 +296,7 @@ class _JourneySheet extends StatelessWidget {
           if (contacts.loading && !contacts.loaded)
             const Padding(padding: EdgeInsets.all(8), child: LinearProgressIndicator())
           else if (contacts.error != null && !contacts.loaded)
-            Text(contacts.error!, style: const TextStyle(color: SwColors.primary))
+            Text(contacts.error!, style: const TextStyle(color: SwColors.error))
           else if (contacts.contacts.isEmpty)
             Row(children: [
               const Expanded(child: Text('Add a trusted contact before starting.')),

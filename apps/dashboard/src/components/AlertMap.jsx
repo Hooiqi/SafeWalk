@@ -13,6 +13,7 @@ function FitOnChange({ bounds, alertId }) {
   return null;
 }
 
+/** Map colours come from tokens through class names (ui.css), never literals. */
 export default function AlertMap({ alert }) {
   const trip = alert.trigger_type === 'ETA' ? alert.trip : null;
   const route = useMemo(() => trip?.route_geometry?.coordinates?.map(([lng, lat]) => [lat, lng]) ?? [], [trip?.route_geometry]);
@@ -24,24 +25,24 @@ export default function AlertMap({ alert }) {
 
   if (!lastPos && !destination) {
     return (
-      <div className="alert-map alert-map--empty">
-        <p>No GPS position yet. The map appears as soon as the phone sends one.</p>
+      <div className="pane__map pane__map--empty">
+        <p className="muted">No GPS position yet. The map appears as soon as the phone sends one.</p>
       </div>
     );
   }
 
   return (
-    <MapContainer className="alert-map" center={lastPos ?? destination} zoom={17}>
+    <MapContainer className="pane__map" center={lastPos ?? destination} zoom={17}>
       <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} className="sw-dark-tiles" maxZoom={19} />
-      {route.length > 1 && <Polyline positions={route} pathOptions={{ color: '#A89FA3', weight: 4, opacity: 0.5, dashArray: '6 8' }} />}
-      {trail.length > 1 && <Polyline positions={trail} pathOptions={{ color: '#FFA372', weight: 4 }} />}
+      {route.length > 1 && <Polyline positions={route} className="mark-route" pathOptions={{ weight: 4, dashArray: '6 8' }} />}
+      {trail.length > 1 && <Polyline positions={trail} className="mark-trail" pathOptions={{ weight: 4 }} />}
       {destination && (
-        <CircleMarker center={destination} radius={8} pathOptions={{ color: '#FDF9FA', weight: 3, fillColor: '#120F11', fillOpacity: 1 }}>
+        <CircleMarker center={destination} radius={8} className="mark-destination" pathOptions={{ weight: 3 }}>
           <Tooltip>Destination: {trip.destination.label ?? 'pinned point'}</Tooltip>
         </CircleMarker>
       )}
       {lastPos && (
-        <CircleMarker center={lastPos} radius={11} pathOptions={{ color: '#120F11', weight: 3, fillColor: '#FF6B81', fillOpacity: 1 }}>
+        <CircleMarker center={lastPos} radius={11} className="mark-person" pathOptions={{ weight: 3 }}>
           <Tooltip permanent direction="top" offset={[0, -10]}>
             Last known location
           </Tooltip>

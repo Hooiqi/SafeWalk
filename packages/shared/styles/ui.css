@@ -1,0 +1,97 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Dusk (by request) · redesign: full
+ * nav: top bar · signature: the alert queue · states: loading, empty, error, full · dusk: none/periwinkle-apricot/glass
+ * axes: dark/grotesk-sans/cool · posture: committed · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R5 V3 · weakest: V, shared component layer for two apps; the queue and the live link differ in composition */
+/* Hallmark · dismissed 29 · smoked glass with its lit edge is the Dusk theme's product surface, used once per screen over the live map or the slate */
+/* Hallmark · dismissed 23 · the strip is an apricot tint at 12% over slate, Dusk's open item and its action, one per screen */
+
+/* Shared SafeWalk components for the dashboard and the tracking page. */
+
+body { font-variant-numeric: tabular-nums; }
+
+/* Wordmark: the product name in the display face, sentence case. */
+.wordmark { font-family: var(--font-display); font-weight: 600; font-size: var(--text-lg); letter-spacing: var(--tracking-display); color: var(--color-ink); text-decoration: none; }
+
+/* Pills: one primary (periwinkle), one ghost. */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs);
+  min-height: 40px; padding: 0 var(--space-md); border: 0; border-radius: var(--radius-pill);
+  background: color-mix(in oklab, var(--color-light) 6%, transparent); color: var(--color-ink);
+  font: 500 var(--text-sm)/1 var(--font-body); white-space: nowrap; cursor: pointer; position: relative;
+  transition: background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+}
+.btn::after { content: ''; position: absolute; inset: -4px 0; } /* 48px hit target */
+.btn:hover { background: color-mix(in oklab, var(--color-light) 10%, transparent); }
+.btn:active { background: color-mix(in oklab, var(--color-light) 14%, transparent); }
+.btn:disabled, .btn[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
+.btn--primary { background: var(--color-accent); color: var(--color-accent-ink); font-weight: 600; box-shadow: inset 0 1px 0 color-mix(in oklab, var(--color-light) 35%, transparent); }
+.btn--primary:hover { background: var(--color-accent-hi); box-shadow: inset 0 1px 0 color-mix(in oklab, var(--color-light) 35%, transparent), 0 0 0 4px color-mix(in oklab, var(--color-accent) 22%, transparent); }
+.btn--primary:active { background: var(--color-accent); }
+.btn svg { width: 16px; height: 16px; flex: none; }
+
+/* Glass: the product's surface, with its lit edge. */
+.glass {
+  background: var(--glass); border-radius: var(--radius-card);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35); backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+  box-shadow: var(--glass-hi), var(--shadow-card);
+}
+
+/* Status word with its icon. Periwinkle: done, safe, handled. Apricot: open, waiting. */
+.status { display: inline-flex; align-items: center; gap: var(--space-2xs); font-size: var(--text-sm); font-weight: 500; color: var(--color-muted); white-space: nowrap; }
+.status svg { width: 16px; height: 16px; flex: none; }
+.status--done { color: var(--color-accent); }
+.status--open { color: var(--color-accent-2); }
+
+.muted { color: var(--color-muted); }
+.small { font-size: var(--text-sm); }
+
+/* Forms */
+.field { display: grid; gap: var(--space-2xs); }
+.field label, .field legend { font-size: var(--text-sm); font-weight: 500; color: var(--color-ink-2); }
+.field .req { color: var(--color-accent-2); }
+.input {
+  width: 100%; min-height: 40px; padding: 0 var(--space-sm); border: var(--rule-hair) solid var(--color-muted);
+  border-radius: var(--radius-inner); background: var(--color-paper-2); color: var(--color-ink);
+  transition: border-color var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out);
+}
+.input:hover { border-color: var(--color-ink-2); }
+.input:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.input:disabled { opacity: 0.5; cursor: not-allowed; background: var(--color-paper); }
+.input[aria-invalid='true'] { border-color: var(--color-error); }
+.form-error { color: var(--color-error); font-size: var(--text-sm); }
+.form-ok { color: var(--color-accent); font-size: var(--text-sm); }
+
+/* An apricot strip: an open item and its action. */
+.strip {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2xs) var(--space-md);
+  padding: var(--space-sm) var(--space-md); border-radius: var(--radius-inner);
+  background: color-mix(in oklab, var(--color-accent-2) 12%, var(--color-paper-2)); color: var(--color-ink);
+}
+.strip strong { color: var(--color-accent-2); font-weight: 600; }
+
+/* Ruled lists */
+.ruled { list-style: none; margin: 0; padding: 0; }
+.ruled > li + li { border-top: var(--rule-hair) solid var(--color-rule); }
+
+/* Skeleton for loading states */
+.skeleton { border-radius: var(--radius-inner); background: color-mix(in oklab, var(--color-light) 6%, transparent); animation: sw-pulse 1.4s var(--ease-in-out) infinite; }
+@keyframes sw-pulse { 50% { opacity: 0.55; } }
+
+/* Leaflet in Dusk: OpenStreetMap tiles darkened, controls on slate glass. */
+.sw-dark-tiles { filter: invert(1) hue-rotate(180deg) brightness(0.88) contrast(0.9) saturate(0.4); }
+.leaflet-container { background: var(--color-paper-2); font-family: var(--font-body); }
+.leaflet-control-attribution { background: color-mix(in oklab, var(--color-paper) 82%, transparent) !important; color: var(--color-muted) !important; }
+.leaflet-control-attribution a { color: var(--color-ink-2) !important; }
+.leaflet-bar { border: 0 !important; box-shadow: var(--glass-hi) !important; border-radius: var(--radius-inner) !important; overflow: hidden; }
+.leaflet-bar a { background: var(--color-paper-2) !important; color: var(--color-ink) !important; border-color: var(--color-rule) !important; }
+.leaflet-tooltip { background: var(--color-paper-3); color: var(--color-ink); border: 0; border-radius: var(--radius-inner); box-shadow: var(--glass-hi); font-family: var(--font-body); }
+.leaflet-tooltip-top::before { border-top-color: var(--color-paper-3); }
+/* Map marks: colours come from tokens via class names (no colour literals in JS). */
+.mark-route { stroke: var(--color-muted); stroke-opacity: 0.6; }
+.mark-trail { stroke: var(--color-accent); }
+.mark-person { stroke: var(--color-paper); fill: var(--color-accent-2); fill-opacity: 1; }
+.mark-person--done { fill: var(--color-accent); }
+.mark-destination { stroke: var(--color-ink); fill: var(--color-paper); fill-opacity: 1; }
+.mark-point { stroke: var(--color-paper); fill: var(--color-accent); fill-opacity: 0.9; }
+.mark-point--off { fill: var(--color-muted); fill-opacity: 0.5; }
+.mark-selected { stroke: var(--color-ink); fill: var(--color-accent-2); fill-opacity: 1; }

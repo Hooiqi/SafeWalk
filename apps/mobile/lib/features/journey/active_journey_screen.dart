@@ -130,8 +130,8 @@ class _ActiveJourneyScreenState extends State<ActiveJourneyScreen> {
           if (trip.isOpen)
             TextButton.icon(
               onPressed: () => context.push('/sos'),
-              icon: const Icon(Icons.sos_rounded, color: SwColors.primary),
-              label: const Text('SOS', style: TextStyle(color: SwColors.primary, fontWeight: FontWeight.w800)),
+              icon: const Icon(Icons.sos_rounded, color: SwColors.alert),
+              label: const Text('SOS', style: TextStyle(color: SwColors.alert, fontWeight: FontWeight.w800)),
             ),
           if (trip.isOpen && trip.trackingUrl != null)
             IconButton(tooltip: 'Share tracking link', icon: const Icon(Icons.ios_share_rounded), onPressed: () => _share(trip)),
@@ -209,7 +209,7 @@ class _ConnectionStrip extends StatelessWidget {
     return Material(
       color: SwColors.surface.withValues(alpha: 0.95),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(SwRadius.inner),
         side: const BorderSide(color: SwColors.secondary),
       ),
       child: Padding(
@@ -251,7 +251,7 @@ class _StatusSheet extends StatelessWidget {
     final (badge, tone) = tripStatusBadge(trip.status, endReason: trip.endReason);
     final borderColor = switch (trip.status) {
       TripStatus.gracePrompt => SwColors.secondary,
-      TripStatus.escalated => SwColors.primary,
+      TripStatus.escalated => SwColors.alert,
       _ => SwColors.border,
     };
 

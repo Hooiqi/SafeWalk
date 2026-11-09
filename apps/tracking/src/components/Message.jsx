@@ -2,10 +2,10 @@
 export default function Message({ title, children }) {
   return (
     <main className="message">
-      <div className="message__card">
-        <p className="brand">SafeWalk</p>
+      <div className="message__card glass">
+        <span className="wordmark">SafeWalk</span>
         <h1>{title}</h1>
-        <p className="sw-muted">{children}</p>
+        <p className="muted">{children}</p>
       </div>
     </main>
   );

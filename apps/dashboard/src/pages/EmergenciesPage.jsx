@@ -1,3 +1,4 @@
+import { CircleCheck, Radio, RotateCw, Volume2, VolumeX, WifiOff } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import AlertDetail from '../components/AlertDetail.jsx';
 import AlertList from '../components/AlertList.jsx';
@@ -59,17 +60,21 @@ export default function EmergenciesPage({ accessToken, emergencies }) {
       <header className="page__header">
         <div>
           <h1>Live emergencies</h1>
-          <p className="sw-muted">SOS alerts and overdue journeys, newest first.</p>
+          <p className="muted">SOS alerts and overdue journeys, newest first.</p>
         </div>
         <div className="page__actions">
-          <span className={`conn conn--${connection}`}>{connection === 'live' ? 'Live' : 'Reconnecting…'}</span>
+          <span className={`status ${connection === 'live' ? 'status--done' : 'status--open'}`} role="status">
+            {connection === 'live' ? <Radio aria-hidden="true" /> : <WifiOff aria-hidden="true" />}
+            {connection === 'live' ? 'Live' : 'Reconnecting'}
+          </span>
           {alarm.supported && (
-            <button type="button" className={`sw-button${soundOn ? '' : ' sw-button--primary'}`} onClick={toggleSound} aria-pressed={soundOn}>
-              {soundOn ? 'Alarm sound on' : 'Enable alarm sound'}
+            <button type="button" className={`btn${soundOn ? '' : ' btn--primary'}`} onClick={toggleSound} aria-pressed={soundOn}>
+              {soundOn ? <Volume2 aria-hidden="true" /> : <VolumeX aria-hidden="true" />}
+              {soundOn ? 'Alarm sound on' : 'Turn on alarm sound'}
             </button>
           )}
           {soundOn && unacknowledged > 0 && !silenced && (
-            <button type="button" className="sw-button" onClick={() => setSilenced(true)}>
+            <button type="button" className="btn" onClick={() => setSilenced(true)}>
               Silence
             </button>
           )}
@@ -77,28 +82,44 @@ export default function EmergenciesPage({ accessToken, emergencies }) {
       </header>
 
       {unacknowledged > 0 && (
-        <div className="banner" role="alert">
-          <strong>{unacknowledged} unacknowledged emergency{unacknowledged > 1 ? ' alerts' : ' alert'}</strong>
-          <span>Open it, press &ldquo;Received alert&rdquo; and dispatch a patrol. The alarm stops once every alert is acknowledged.</span>
+        <div className="strip" role="alert">
+          <strong>
+            {unacknowledged} {unacknowledged > 1 ? 'alerts' : 'alert'} not acknowledged
+          </strong>
+          <span>Open it, press Received alert and send a patrol. The alarm stops once every alert is acknowledged.</span>
         </div>
       )}
 
-      {status === 'loading' && <p className="sw-muted state">Loading alerts…</p>}
+      {status === 'loading' && (
+        <div className="split" aria-busy="true" aria-label="Loading alerts">
+          <div className="queue-panel">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="skeleton skeleton--row" />
+            ))}
+          </div>
+          <div className="skeleton skeleton--pane" />
+        </div>
+      )}
       {status === 'error' && (
-        <div className="state state--error">
+        <div className="state state--error" role="alert">
           <p>Could not load alerts: {error.message}</p>
-          <button type="button" className="sw-button" onClick={reload}>Try again</button>
+          <button type="button" className="btn" onClick={reload}>
+            <RotateCw aria-hidden="true" /> Try again
+          </button>
         </div>
       )}
       {status === 'ready' && alerts.length === 0 && (
         <div className="state state--empty">
+          <CircleCheck aria-hidden="true" className="state__icon" />
           <h2>No open emergencies</h2>
-          <p className="sw-muted">New SOS and overdue-journey alerts appear here immediately, with an alarm if sound is enabled.</p>
+          <p className="muted">New SOS and overdue-journey alerts appear here at once, with an alarm when sound is on.</p>
         </div>
       )}
       {status === 'ready' && alerts.length > 0 && (
         <div className="split">
-          <AlertList alerts={alerts} selectedId={selected?.alert_id} onSelect={setSelectedId} now={now} />
+          <div className="queue-panel">
+            <AlertList alerts={alerts} selectedId={selected?.alert_id} onSelect={setSelectedId} now={now} />
+          </div>
           {selected && <AlertDetail alert={selected} now={now} accessToken={accessToken} onUpdated={replaceAlert} />}
         </div>
       )}

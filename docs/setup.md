@@ -76,6 +76,16 @@ npm run dev:dashboard
 
 Tracking page: http://localhost:5173/t/<token>. Dashboard: http://localhost:5174.
 
+The public landing page needs no keys:
+
+```bash
+npm run dev:landing
+```
+
+It runs at http://localhost:5175. Its buttons point at the local app and
+dashboard; for a deployment, copy `apps/landing/.env.example` to
+`apps/landing/.env` and set `VITE_APP_URL` and `VITE_DASHBOARD_URL`.
+
 ## 4. Mobile app
 
 See `apps/mobile/README.md`.
@@ -140,6 +150,7 @@ plays the phone's part with a real test account (see the script header).
 ## Environment variables
 
 All variables are documented in `apps/server/.env.example`,
-`apps/dashboard/.env.example`, `apps/tracking/.env.example` and
+`apps/dashboard/.env.example`, `apps/tracking/.env.example`,
+`apps/landing/.env.example` and
 `apps/mobile/env/dev.example.json`. Never commit real `.env` files or keys.
 The service-role key and database URL are used only by the server.

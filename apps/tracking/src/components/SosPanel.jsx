@@ -1,4 +1,6 @@
+import { CircleCheck, Siren } from 'lucide-react';
 import { formatAgo, formatTime } from '@safewalk/shared';
+import { LiveState } from './StatusPanel.jsx';
 
 const SECURITY_TEXT = {
   NEW: 'USM Security has been alerted and is reviewing it.',
@@ -13,61 +15,60 @@ export default function SosPanel({ view, now, connection }) {
   const ended = view.status === 'RESOLVED' || Boolean(view.user_safe_at);
   const last = view.last_location;
 
-  let badge;
+  let word;
   let title;
   if (view.user_safe_at) {
-    badge = { tone: 'done', text: 'Marked safe' };
+    word = 'Marked safe';
     title = `${view.traveller_name} marked themselves safe at ${formatTime(view.user_safe_at)}`;
   } else if (view.status === 'RESOLVED') {
-    badge = { tone: 'done', text: 'Resolved' };
+    word = 'Resolved';
     title = `Resolved by USM Security at ${formatTime(view.resolved_at)}`;
   } else {
-    badge = { tone: 'danger', text: view.silent ? 'Silent SOS' : 'SOS' };
+    word = view.silent ? 'Silent SOS' : 'SOS';
     title = `${view.traveller_name} needs help`;
   }
 
   return (
-    <section className={`panel panel--${ended ? 'done' : 'danger'}`} aria-live="polite">
+    <section className="panel glass" aria-live="polite">
       <header className="panel__header">
-        <p className="brand">SafeWalk</p>
-        {!ended && (
-          <span className={`live live--${connection}`}>
-            {connection === 'live' ? 'Live' : connection === 'closed' ? 'Offline' : 'Reconnecting…'}
-          </span>
-        )}
+        <span className="wordmark">SafeWalk</span>
+        {!ended && <LiveState connection={connection} />}
       </header>
 
-      <span className={`sw-badge sw-badge--${badge.tone}`}>{badge.text}</span>
+      <span className={`status ${ended ? 'status--done' : 'status--open'}`}>
+        {ended ? <CircleCheck aria-hidden="true" /> : <Siren aria-hidden="true" />} {word}
+      </span>
       <h1 className="panel__title">{title}</h1>
       <p className="panel__detail">
         {SECURITY_TEXT[view.status]}
         {!ended && ' If you believe someone is in immediate danger, call 999.'}
       </p>
       {view.silent && !ended && (
-        <p className="notice" role="status">
-          This is a silent SOS: {view.traveller_name} may be hiding or unable to speak. Do not call them unless you are sure it is safe.
+        <p className="strip" role="status">
+          <strong>Silent SOS</strong>
+          <span>{view.traveller_name} may be hiding or unable to speak. Do not call them unless you are sure it is safe.</span>
         </p>
       )}
 
       <dl className="facts">
-        <div>
+        <div className="facts__row">
           <dt>SOS sent</dt>
-          <dd className="sw-num">{formatTime(view.triggered_at)}</dd>
+          <dd className="num">{formatTime(view.triggered_at)}</dd>
         </div>
-        <div>
+        <div className="facts__row">
           <dt>Last updated</dt>
-          <dd className="sw-num">{last ? formatAgo(last.recorded_at, now) : 'Waiting for GPS'}</dd>
+          <dd className="num">{last ? formatAgo(last.recorded_at, now) : 'Waiting for GPS'}</dd>
         </div>
         {last?.accuracy_m != null && (
-          <div>
+          <div className="facts__row">
             <dt>GPS accuracy</dt>
-            <dd className="sw-num">± {Math.round(last.accuracy_m)} m</dd>
+            <dd className="num">{Math.round(last.accuracy_m)} m</dd>
           </div>
         )}
         {last?.battery_level != null && (
-          <div>
+          <div className="facts__row">
             <dt>Phone battery</dt>
-            <dd className="sw-num">{last.battery_level}%</dd>
+            <dd className="num">{last.battery_level}%</dd>
           </div>
         )}
       </dl>

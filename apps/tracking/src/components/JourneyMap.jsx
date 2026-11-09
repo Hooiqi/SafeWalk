@@ -53,11 +53,11 @@ export default function JourneyMap({ view }) {
     <MapContainer className="map" center={destination ?? current ?? [5.3559, 100.3025]} zoom={16} zoomControl attributionControl>
       <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} className="sw-dark-tiles" maxZoom={19} />
       {route.length > 1 && (
-        <Polyline positions={route} pathOptions={{ color: '#A89FA3', weight: 4, opacity: 0.55, dashArray: '6 8' }} />
+        <Polyline positions={route} className="mark-route" pathOptions={{ weight: 4, dashArray: '6 8' }} />
       )}
-      {trail.length > 1 && <Polyline positions={trail} pathOptions={{ color: '#FFA372', weight: 4, opacity: 0.95 }} />}
+      {trail.length > 1 && <Polyline positions={trail} className="mark-trail" pathOptions={{ weight: 4 }} />}
       {destination && (
-      <CircleMarker center={destination} radius={9} pathOptions={{ color: '#FDF9FA', weight: 3, fillColor: '#120F11', fillOpacity: 1 }}>
+      <CircleMarker center={destination} radius={9} className="mark-destination" pathOptions={{ weight: 3 }}>
         <Tooltip direction="top" offset={[0, -8]} permanent={false}>
           {view.destination.label ?? 'Destination'}
         </Tooltip>
@@ -67,12 +67,9 @@ export default function JourneyMap({ view }) {
         <CircleMarker
           center={current}
           radius={10}
-          pathOptions={{
-            color: '#120F11',
-            weight: 3,
-            fillColor: emergency ? '#FF6B81' : ended ? '#A89FA3' : '#FF6B81',
-            fillOpacity: 1,
-          }}
+          key={ended && !emergency ? 'person-done' : 'person-live'}
+          className={emergency || !ended ? 'mark-person' : 'mark-person mark-person--done'}
+          pathOptions={{ weight: 3 }}
         >
           <Tooltip direction="top" offset={[0, -10]}>
             {view.traveller_name} · last position

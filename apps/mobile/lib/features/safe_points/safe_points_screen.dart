@@ -347,7 +347,7 @@ class _SafePointPin extends StatelessWidget {
           decoration: BoxDecoration(
             color: selected ? SwColors.primary : SwColors.surfaceRaised,
             shape: BoxShape.circle,
-            border: Border.all(color: selected ? SwColors.text : SwColors.secondary, width: 2),
+            border: Border.all(color: selected ? SwColors.text : SwColors.textMuted, width: 2),
           ),
           child: Icon(iconFor(point.category), size: 16, color: selected ? SwColors.onAccent : SwColors.text),
         ),

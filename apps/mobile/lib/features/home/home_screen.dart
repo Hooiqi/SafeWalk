@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Card(
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                leading: const Icon(Icons.shield_outlined, color: SwColors.secondary),
+                leading: const Icon(Icons.shield_outlined, color: SwColors.text2),
                 title: const Text('Nearest safe point'),
                 subtitle: Text('Security posts, colleges and 24-hour places that are open now', style: text.bodySmall),
                 trailing: const Icon(Icons.chevron_right_rounded),
@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Card(
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                leading: const Icon(Icons.group_outlined, color: SwColors.secondary),
+                leading: const Icon(Icons.group_outlined, color: SwColors.text2),
                 title: const Text('Trusted contacts'),
                 subtitle: Text(
                   contacts.loaded ? '${contacts.contacts.length} saved' : 'Loading…',
@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Card(
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                leading: const Icon(Icons.history_rounded, color: SwColors.secondary),
+                leading: const Icon(Icons.history_rounded, color: SwColors.text2),
                 title: const Text('Journey history'),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => context.push('/history'),
@@ -121,10 +121,10 @@ class _SosActiveCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: SwColors.primary, width: 2)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(SwRadius.card), side: const BorderSide(color: SwColors.alert, width: 2)),
         child: ListTile(
           contentPadding: const EdgeInsets.all(16),
-          leading: const Icon(Icons.sos_rounded, color: SwColors.primary, size: 32),
+          leading: const Icon(Icons.sos_rounded, color: SwColors.alert, size: 32),
           title: Text(sending ? 'Sending your SOS…' : 'Your SOS is active', style: const TextStyle(fontWeight: FontWeight.w700)),
           subtitle: const Text('Open to see updates from USM Security'),
           trailing: const Icon(Icons.chevron_right_rounded),
@@ -179,11 +179,11 @@ class _ActiveJourneyCard extends StatelessWidget {
     final urgent = trip.status != 'ACTIVE';
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: urgent ? (tone == BadgeTone.danger ? SwColors.primary : SwColors.secondary) : SwColors.border),
+        borderRadius: BorderRadius.circular(SwRadius.card),
+        side: BorderSide(color: urgent ? SwColors.alert : SwColors.border),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(SwRadius.card),
         onTap: () => context.go('/journey'),
         child: Padding(
           padding: const EdgeInsets.all(18),

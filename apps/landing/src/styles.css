@@ -1,0 +1,194 @@
+/* Hallmark · shape: try anatomy, Stage hero then tour, tally, hand-off, product, index, close · genre: modern-minimal · theme: Dusk (by request) · job: try, the app link in the nav, the hero and the close
+ * hero: Stage · nav: edge-aligned, a wordmark and two actions · footer: colophon block · imagery: the product, captured, and the USM Penang entrance at dusk behind the hero (supplied by the team, graded to Dusk) · signature: one walk escalating, as security sees it · dusk: campus/periwinkle-apricot/glass (hour: the team's own USM photograph in place of a library landscape)
+ * axes: dark/grotesk-sans/cool · posture: committed · contrast: pass · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V4 · weakest: P, a safety page wants calm over alarm; the hero states the one promise (keeps watch) and the run shows it instead of a list of features */
+/* Hallmark · dismissed 29 · smoked glass with its lit edge is the Dusk product surface, used twice: the hero run and the dashboard frame */
+/* Hallmark · waive 84 · the hero run is built from the product's real states and times · the escalation spans five minutes across the phone, the server and the dashboard, so no single capture shows it; every other picture is a capture */
+@import url("./tokens.css");
+@import url("./base.css");
+
+body { font-variant-numeric: tabular-nums; }
+
+/* ---- Controls ---- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs);
+  min-height: 44px; padding: 0 var(--space-lg); border: 0; border-radius: var(--radius-pill);
+  background: color-mix(in oklab, var(--color-light) 4%, transparent); color: var(--color-ink);
+  font: 600 0.9375rem/1 var(--font-body); text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+}
+.btn:hover { background: color-mix(in oklab, var(--color-light) 9%, transparent); }
+.btn:active { background: color-mix(in oklab, var(--color-light) 13%, transparent); }
+.btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.btn[aria-disabled='true'], .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn--primary { background: var(--color-accent); color: var(--color-accent-ink); box-shadow: inset 0 1px 0 color-mix(in oklab, var(--color-light) 35%, transparent); }
+.btn--primary:hover { background: var(--color-accent-hi); box-shadow: inset 0 1px 0 color-mix(in oklab, var(--color-light) 35%, transparent), 0 0 0 4px color-mix(in oklab, var(--color-accent) 22%, transparent); }
+.btn--primary:active { background: var(--color-accent); }
+.btn--large { min-height: 52px; padding: 0 var(--space-xl); font-size: var(--text-md); }
+
+.glass {
+  background: var(--glass); border-radius: var(--radius-card);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35); backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+  box-shadow: var(--glass-hi), var(--shadow-card);
+}
+
+.state { display: inline-flex; align-items: center; gap: var(--space-2xs); font-size: var(--text-sm); font-weight: 500; white-space: nowrap; }
+.state svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.state--done { color: var(--color-accent); }
+.state--open { color: var(--color-accent-2); }
+
+/* ---- Nav ---- */
+.nav { position: sticky; top: 0; z-index: var(--z-sticky-nav); background: color-mix(in oklab, var(--color-paper) 80%, transparent); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+.nav__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); min-height: 72px; }
+.wordmark { font-family: var(--font-display); font-weight: 600; font-size: var(--text-lg); letter-spacing: var(--tracking-display); color: var(--color-ink); text-decoration: none; }
+.wordmark:focus-visible, .nav__link:focus-visible, a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.nav__actions { display: flex; align-items: center; gap: var(--space-md); }
+.nav__link { color: var(--color-ink-2); text-decoration: none; font-weight: 500; white-space: nowrap; transition: color var(--dur-micro) var(--ease-out); }
+.nav__link:hover { color: var(--color-ink); text-decoration: underline; }
+
+/* ---- Hero: Stage over the campus at dusk ---- */
+.hero { position: relative; isolation: isolate; overflow: clip; }
+.hero__photo { position: absolute; inset: 0; z-index: -2; }
+.hero__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 62% 40%; animation: hour-drift 48s var(--ease-in-out) infinite alternate; }
+/* Slate behind the words on the left, the building left clear under the glass, the foot fading into the page. */
+.hero::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    linear-gradient(90deg, color-mix(in oklab, var(--color-paper) 84%, transparent) 0%, color-mix(in oklab, var(--color-paper) 52%, transparent) 40%, color-mix(in oklab, var(--color-paper) 6%, transparent) 72%, color-mix(in oklab, var(--color-paper) 14%, transparent) 100%),
+    linear-gradient(180deg, color-mix(in oklab, var(--color-paper) 24%, transparent) 0%, transparent 24%, transparent 70%, var(--color-paper) 100%);
+}
+@keyframes hour-drift { from { transform: scale(1.06) translateX(0); } to { transform: scale(1.06) translateX(-3%); } }
+.hero__grid {
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--space-3xl); align-items: center;
+  min-height: calc(100dvh - 72px); padding-block: var(--space-xl) var(--space-2xl);
+}
+.hero h1 { font-size: min(var(--text-display), 4.75rem); line-height: 1.04; }
+.hero .lead { margin-top: var(--space-lg); color: var(--color-ink-2); max-width: 30ch; }
+.hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md); margin-top: var(--space-xl); }
+.hero__who { color: var(--color-muted); font-size: var(--text-sm); }
+
+/* The run: one walk escalating, as USM Security sees it. */
+.run { margin: 0; padding: var(--space-lg); }
+.run__head { display: flex; justify-content: space-between; gap: var(--space-md); padding-bottom: var(--space-md); }
+.run__title { font-weight: 600; }
+.run__meta { color: var(--color-muted); }
+.run__rows { list-style: none; margin: 0; padding: 0; }
+.run__row {
+  display: grid; grid-template-columns: 4rem minmax(0, 1fr) auto; gap: var(--space-md); align-items: start;
+  padding: var(--space-md) 0; border-top: var(--rule-hair) solid color-mix(in oklab, var(--color-light) 7%, transparent);
+}
+.run__time { color: var(--color-muted); }
+.run__what { display: grid; gap: var(--space-3xs); font-weight: 500; }
+.run__sub { color: var(--color-muted); font-weight: 400; font-size: var(--text-sm); }
+.run__open {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-xs) var(--space-md);
+  margin-top: var(--space-xs); padding: var(--space-md); border-radius: var(--radius-inner);
+  background: color-mix(in oklab, var(--color-accent-2) 13%, var(--color-paper-2));
+}
+.run__open strong { font-weight: 600; }
+.run__open-state { color: var(--color-accent-2); font-weight: 600; }
+.run__caption { margin-top: var(--space-md); font-size: var(--text-sm); color: var(--color-muted); max-width: 56ch; }
+
+/* ---- Tour: a list beside one pane ---- */
+.tour { padding-block: var(--section-gap-s) var(--section-gap); }
+.tour__grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-3xl); align-items: center; }
+.tour .lead { margin-top: var(--space-md); color: var(--color-ink-2); }
+.tour__list { list-style: none; margin: var(--space-2xl) 0 0; padding: 0; }
+.tour__list > li + li { border-top: var(--rule-hair) solid var(--color-rule); }
+.tour__list > li { padding-block: var(--space-md); }
+.tour__item {
+  display: flex; align-items: center; gap: var(--space-md); width: 100%; min-height: 44px; padding: 0; border: 0; background: none;
+  color: var(--color-muted); font-family: var(--font-display); font-size: var(--text-title); font-weight: 500; text-align: left; white-space: nowrap; cursor: pointer;
+  transition: color var(--dur-micro) var(--ease-out);
+}
+.tour__item::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: var(--radius-pill); background: var(--color-rule); }
+.tour__item:hover { color: var(--color-ink-2); }
+.tour__item:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.tour__item:active { color: var(--color-ink); }
+.tour__item:disabled { opacity: 0.5; cursor: not-allowed; }
+.tour__item[aria-pressed='true'] { color: var(--color-ink); }
+.tour__item[aria-pressed='true']::before { background: var(--color-accent); }
+.tour__line { display: none; margin-left: var(--space-lg); color: var(--color-ink-2); }
+.tour__item[aria-pressed='true'] + .tour__line { display: block; }
+
+.phone { margin: 0; justify-self: center; width: min(100%, 340px); }
+.phone img { width: 100%; border-radius: 32px; box-shadow: var(--glass-hi), var(--shadow-card); }
+.phone--small { width: min(100%, 280px); }
+
+/* ---- Tally ---- */
+.tally { padding-block: var(--section-gap-s); background: var(--color-paper-2); }
+.tally__head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--space-3xl); align-items: end; }
+.tally__head .lead { color: var(--color-ink-2); }
+.tally__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-xl) var(--space-3xl); margin: var(--space-2xl) 0 0; }
+.tally__item { padding-top: var(--space-md); border-top: var(--rule-hair) solid var(--color-rule); }
+.figure { font-family: var(--font-display); font-weight: 500; font-size: clamp(2.5rem, 2vw + 1.75rem, 3.5rem); line-height: 1; letter-spacing: var(--tracking-display); }
+.figure .unit { margin-left: var(--space-2xs); font-size: 0.5em; color: var(--color-muted); }
+.tally__item dd { margin: var(--space-md) 0 0; color: var(--color-ink-2); max-width: 28ch; }
+
+/* ---- Hand-off in a well ---- */
+.handoff { padding-block: var(--section-gap-l) var(--section-gap); }
+.handoff__grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: var(--space-3xl); align-items: center; }
+.handoff .lead { margin-top: var(--space-md); color: var(--color-ink-2); }
+.well { margin: 0; }
+.well > .well__card {
+  margin: 0; padding: var(--space-2xl); border-radius: var(--radius-card);
+  background: var(--color-well); color: var(--color-well-ink);
+  box-shadow: 0 0 0 var(--space-xl) var(--color-well-2);
+}
+.well__from { font-weight: 600; color: var(--color-well-ink); }
+.well__text { margin-top: var(--space-sm); font-size: var(--text-lg); line-height: 1.5; color: var(--color-well-ink); }
+.well figcaption { display: grid; gap: var(--space-3xs); margin-top: var(--space-2xl); color: var(--color-muted); font-size: var(--text-sm); }
+.well figcaption strong { color: var(--color-ink); font-weight: 600; }
+
+/* ---- The product at work ---- */
+.desk { padding-block: var(--section-gap-l) var(--section-gap); }
+.desk__head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--space-3xl); align-items: end; }
+.desk__head .lead { color: var(--color-ink-2); }
+.desk__shot { margin: var(--space-2xl) 0 0; padding: var(--space-xs); }
+.desk__shot img { width: 100%; border-radius: var(--radius-inner); }
+
+/* ---- Index of 24-hour places ---- */
+.night { padding-block: var(--section-gap-s) var(--section-gap); }
+.night__head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--space-3xl); align-items: end; }
+.night__head .lead { color: var(--color-ink-2); }
+.night__table { width: 100%; margin-top: var(--space-2xl); border-collapse: collapse; }
+.night__table th { padding: 0 0 var(--space-sm); text-align: left; font-size: var(--text-sm); font-weight: 500; color: var(--color-muted); border-bottom: var(--rule-hair) solid var(--color-rule); }
+.night__table td { padding: var(--space-md) var(--space-md) var(--space-md) 0; border-bottom: var(--rule-hair) solid var(--color-rule); font-size: var(--text-lg); }
+.night__table td:first-child { font-weight: 500; }
+.night__table td:nth-child(2) { color: var(--color-ink-2); font-size: var(--text-md); }
+.night__table a { color: var(--color-accent); text-decoration: none; white-space: nowrap; }
+.night__table a:hover { text-decoration: underline; }
+.night__note { margin-top: var(--space-lg); color: var(--color-muted); }
+
+/* ---- Close ---- */
+.close { padding-block: var(--section-gap-s); background: var(--color-paper-2); }
+.close__grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-3xl); align-items: center; }
+.close .lead { margin-top: var(--space-md); color: var(--color-ink-2); }
+.close__actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-xl); }
+
+/* ---- Footer: colophon block ---- */
+.footer { padding-block: var(--space-3xl) var(--space-2xl); }
+.footer__inner { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--space-xl) var(--space-3xl); align-items: start; }
+.footer__mark { font-family: var(--font-display); font-weight: 500; font-size: var(--text-3xl); letter-spacing: var(--tracking-display); }
+.footer__colophon { color: var(--color-muted); max-width: 60ch; }
+.footer__colophon a { color: var(--color-ink-2); white-space: nowrap; }
+
+/* ---- Tablet and phone ---- */
+@media (max-width: 60rem) {
+  .hero__grid, .tour__grid, .handoff__grid, .close__grid, .footer__inner, .tally__head, .desk__head, .night__head { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-xl); }
+  .hero__grid { min-height: 0; padding-block: var(--space-xl) var(--space-2xl); }
+  /* Stacked: the photo sits at the top behind the words, the glass run below it on slate. */
+  .hero__photo { bottom: auto; height: 70svh; -webkit-mask-image: linear-gradient(180deg, var(--color-paper) 55%, transparent); mask-image: linear-gradient(180deg, var(--color-paper) 55%, transparent); }
+  .hero__photo img { object-position: 58% 50%; }
+  .hero::after { background: linear-gradient(180deg, color-mix(in oklab, var(--color-paper) 55%, transparent) 0%, color-mix(in oklab, var(--color-paper) 74%, transparent) 40%, var(--color-paper) 62svh); }
+  .tally__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .well > .well__card { padding: var(--space-xl); box-shadow: 0 0 0 var(--space-md) var(--color-well-2); }
+}
+@media (max-width: 40rem) {
+  .nav__link { display: none; }
+  .tally__grid { grid-template-columns: minmax(0, 1fr); }
+  .run__row { grid-template-columns: 3rem minmax(0, 1fr); }
+  .run__row .state { grid-column: 2; }
+  .night__table td:nth-child(2), .night__table th:nth-child(2) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .hero__photo img { animation: none; transform: scale(1.06); } }

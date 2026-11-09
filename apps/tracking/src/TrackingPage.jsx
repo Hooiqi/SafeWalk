@@ -40,7 +40,7 @@ export default function TrackingPage() {
   if (!view) {
     return (
       <main className="message" aria-busy="true">
-        <p className="sw-muted">Loading journey…</p>
+        <p className="muted">Loading the journey</p>
       </main>
     );
   }

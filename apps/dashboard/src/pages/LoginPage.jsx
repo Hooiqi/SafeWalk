@@ -18,27 +18,30 @@ export default function LoginPage({ notice }) {
 
   return (
     <main className="login">
-      <form className="login__card" onSubmit={submit} noValidate>
-        <p className="brand">SafeWalk</p>
-        <h1>Security staff sign in</h1>
-        <p className="sw-muted">For authorised USM Security Department personnel. Access is limited to allow-listed staff emails.</p>
+      <form className="login__card glass" onSubmit={submit} noValidate>
+        <span className="wordmark">SafeWalk</span>
+        <h1>Security sign in</h1>
+        <p className="muted">For USM Security Department staff on the allow-list.</p>
 
         {notice && <p className="form-error" role="alert">{notice}</p>}
 
-        <label className="label" htmlFor="email">
-          Staff email <span aria-hidden="true">*</span>
-        </label>
-        <input id="email" className="sw-input" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
-
-        <label className="label" htmlFor="password">
-          Password <span aria-hidden="true">*</span>
-        </label>
-        <input id="password" className="sw-input" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+        <div className="field">
+          <label htmlFor="email">
+            Staff email <span className="req" aria-hidden="true">*</span>
+          </label>
+          <input id="email" className="input" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
+        </div>
+        <div className="field">
+          <label htmlFor="password">
+            Password <span className="req" aria-hidden="true">*</span>
+          </label>
+          <input id="password" className="input" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
 
         {error && <p className="form-error" role="alert">{error}</p>}
 
-        <button type="submit" className="sw-button sw-button--primary login__submit" disabled={busy || !email || !password}>
-          {busy ? 'Signing in…' : 'Sign in'}
+        <button type="submit" className="btn btn--primary login__submit" disabled={busy || !email || !password}>
+          {busy ? 'Signing in' : 'Sign in'}
         </button>
       </form>
     </main>

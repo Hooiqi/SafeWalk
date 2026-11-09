@@ -15,7 +15,7 @@ class WelcomeScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Wordmark(size: 16),
+            const Wordmark(size: 22),
             const Spacer(),
             Text('Campus safety,\nconnected.', style: text.headlineMedium?.copyWith(fontWeight: FontWeight.w700, height: 1.15)),
             const SizedBox(height: 12),
@@ -48,7 +48,7 @@ class _Point extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: 14),
         child: Row(children: [
-          Icon(icon, color: SwColors.secondary, size: 22),
+          Icon(icon, color: SwColors.primary, size: 22),
           const SizedBox(width: 14),
           Expanded(child: Text(text)),
         ]),

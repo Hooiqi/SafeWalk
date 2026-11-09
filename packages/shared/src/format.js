@@ -12,8 +12,8 @@ const dateTimeFmt = new Intl.DateTimeFormat('en-MY', {
   minute: '2-digit',
 });
 
-export const formatTime = (iso) => (iso ? timeFmt.format(new Date(iso)) : '—');
-export const formatDateTime = (iso) => (iso ? dateTimeFmt.format(new Date(iso)) : '—');
+export const formatTime = (iso) => (iso ? timeFmt.format(new Date(iso)) : 'Not recorded');
+export const formatDateTime = (iso) => (iso ? dateTimeFmt.format(new Date(iso)) : 'Not recorded');
 
 /** "8 min", "1 h 05 min", "45 s" */
 export function formatDuration(seconds) {
@@ -33,6 +33,6 @@ export function formatAgo(iso, now = Date.now()) {
 }
 
 export function formatDistance(m) {
-  if (m == null) return '—';
+  if (m == null) return 'Unknown';
   return m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).toFixed(1)} km`;
 }
