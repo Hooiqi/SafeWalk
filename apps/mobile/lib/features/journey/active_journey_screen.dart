@@ -1,10 +1,10 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../core/api_client.dart';
 import '../../core/constants.dart';
@@ -14,6 +14,7 @@ import '../../data/models.dart';
 import '../../services/trip_tracker.dart';
 import '../../widgets/campus_map.dart';
 import '../../widgets/common.dart';
+import '../../widgets/share_link.dart';
 
 /// Module 1, Features 2-5: live journey with the server's ETA state,
 /// grace-period check-in, escalation state and safe arrival.
@@ -88,10 +89,7 @@ class _ActiveJourneyScreenState extends State<ActiveJourneyScreen> {
   void _share(Trip trip) {
     final url = trip.trackingUrl;
     if (url == null) return;
-    SharePlus.instance.share(ShareParams(
-      text: 'Follow my walk on SafeWalk until I arrive: $url',
-      subject: 'My SafeWalk journey',
-    ));
+    shareLink(context, text: 'Follow my walk on SafeWalk until I arrive: $url', subject: 'My SafeWalk journey');
   }
 
   @override
@@ -357,7 +355,7 @@ class _StatusSheet extends StatelessWidget {
                   Expanded(
                     child: Text('Some contacts could not be messaged automatically. Share the link yourself.', style: text.bodySmall),
                   ),
-                  TextButton(onPressed: onShare, child: const Text('Share link')),
+                  TextButton(onPressed: onShare, child: const Text(kIsWeb ? 'Copy link' : 'Share link')),
                 ]),
               ),
           ]),

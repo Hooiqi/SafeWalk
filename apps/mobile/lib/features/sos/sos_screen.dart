@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../core/api_client.dart';
 import '../../core/config.dart';
@@ -12,6 +11,7 @@ import '../../data/models.dart';
 import '../../services/phone_dialer.dart';
 import '../../services/sos_controller.dart';
 import '../../widgets/common.dart';
+import '../../widgets/share_link.dart';
 import '../../widgets/hold_to_confirm_button.dart';
 
 /// Module 2: hold-to-confirm SOS, silent SOS and one-tap emergency calling.
@@ -250,7 +250,7 @@ class _ActiveViewState extends State<_ActiveView> {
       const SizedBox(height: 20),
       if (alert.trackingUrl != null)
         OutlinedButton.icon(
-          onPressed: () => SharePlus.instance.share(ShareParams(text: 'I need help. Follow my live location: ${alert.trackingUrl}')),
+          onPressed: () => shareLink(context, text: 'I need help. Follow my live location: ${alert.trackingUrl}'),
           icon: const Icon(Icons.ios_share_rounded),
           label: const Text('Share live location link'),
         ),
