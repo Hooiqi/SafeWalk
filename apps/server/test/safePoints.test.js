@@ -17,6 +17,7 @@ const slowWalk = ({ lat, lng }) =>
 
 let deps;
 let app;
+let migrated; // positions set by the 20261113000100 migration, read before the fixtures replace them
 let student;
 let officer;
 const ids = {};
@@ -37,6 +38,14 @@ before(async () => {
   const url = await createTestDatabase('safepoints');
   deps = await build(url);
   app = createApp(deps);
+  migrated = (
+    await deps.pool.query(
+      `select name, extensions.st_y(location::extensions.geometry) as lat, extensions.st_x(location::extensions.geometry) as lng
+         from public.safe_point order by name`,
+    )
+  ).rows;
+  // The navigator tests below use fixture positions, independent of the real map.
+  await deps.pool.query('update public.safe_point set location = null');
   student = await createUser(deps.pool, { name: 'Aina Sample' });
   officer = await createStaff(deps.pool);
   const list = await request(app).get('/api/staff/safe-points').set(auth(officer));
@@ -53,6 +62,15 @@ beforeEach(() => deps.clock.set(SAT_10AM));
 const nearest = (a = app) => request(a).get(`/api/safe-points/nearest?lat=${ORIGIN.lat}&lng=${ORIGIN.lng}`).set(auth(student));
 
 describe('safe point data', () => {
+  it('the location migration pins all 21 places; 20 inside USM Minden, the Sungai Nibong police station south of it', () => {
+    assert.equal(migrated.length, 21);
+    assert.deepEqual(migrated.filter((p) => p.lat == null).map((p) => p.name), [], 'every point has a position');
+    const outside = migrated.filter((p) => !(p.lat > 5.352 && p.lat < 5.363 && p.lng > 100.288 && p.lng < 100.307));
+    assert.deepEqual(outside.map((p) => p.name), ['Balai Polis Sungai Nibong']);
+    const foyer = migrated.find((p) => p.name.startsWith('24-Hour Reading Foyer'));
+    assert.ok(Math.abs(foyer.lat - 5.358776) < 1e-6 && Math.abs(foyer.lng - 100.302848) < 1e-6);
+  });
+
   it('loads the 21 supplied safe points without inventing locations', async () => {
     const res = await request(app).get('/api/staff/safe-points').set(auth(officer));
     assert.equal(res.body.safe_points.length, 21);
