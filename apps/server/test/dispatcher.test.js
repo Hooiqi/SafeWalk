@@ -55,4 +55,33 @@ describe('parallel notification dispatcher', () => {
     assert.equal(byChannel.email.reason, 'smtp down');
     assert.equal(byChannel.telegram.status, 'sent');
   });
+
+  it('retries a delivery whose connection broke before the provider answered, but not a refusal', async () => {
+    const networkError = () => Object.assign(new TypeError('fetch failed'), { cause: { code: 'ECONNRESET' } });
+    let telegramCalls = 0;
+    let emailCalls = 0;
+    const dispatcher = createDispatcher({
+      logger,
+      timeoutMs: 100,
+      retryDelaysMs: [1, 1],
+      channels: [
+        // Fails once like a stale kept-alive socket, then works.
+        { name: 'telegram', configured: true, canReach: () => true, send: async () => { telegramCalls += 1; if (telegramCalls === 1) throw networkError(); } },
+        // Telegram/SMTP refusing the request is final.
+        { name: 'email', configured: true, canReach: () => true, send: async () => { emailCalls += 1; throw new Error('Telegram responded 403'); } },
+        // Never reachable: gives up after the retries, with the cause in the reason.
+        { name: 'sms', configured: true, canReach: () => true, send: async () => { throw networkError(); } },
+      ],
+    });
+    const results = await dispatcher.toContacts([contacts[0]], message);
+    const byChannel = Object.fromEntries(results.map((r) => [r.channel, r]));
+    assert.equal(byChannel.telegram.status, 'sent');
+    assert.equal(byChannel.telegram.attempts, 2);
+    assert.equal(telegramCalls, 2);
+    assert.equal(byChannel.email.status, 'failed');
+    assert.equal(emailCalls, 1, 'refusals are not retried');
+    assert.equal(byChannel.sms.status, 'failed');
+    assert.equal(byChannel.sms.attempts, 3);
+    assert.equal(byChannel.sms.reason, 'fetch failed (ECONNRESET)');
+  });
 });
